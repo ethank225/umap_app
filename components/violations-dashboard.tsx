@@ -13,7 +13,8 @@ import { useViolations } from "@/lib/violations-context"
 import { useViolationsData } from "./hooks/use-violations-data"
 import { useFilteredViolations } from "./hooks/use-filtered-violations"
 import { useComplianceMetrics } from "./hooks/use-compliance-metrics"
-import { Mail, AlertTriangle, XCircle, Loader2 } from "lucide-react"
+import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw } from "lucide-react"
+import { TableLoadingSkeleton } from "./table-loading-skeleton"
 
 interface FiltersState {
   search: string
@@ -235,9 +236,19 @@ export function ViolationsDashboard() {
             </Button>
           </div>
         )}
+
+        {/* Data update status */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <RefreshCw className="h-3 w-3" />
+          <span>Updated daily</span>
+        </div>
       </div>
 
       {/* Table */}
+      {isLoading && (
+        <TableLoadingSkeleton />
+      )}
+
       {!isLoading && violations.length === 0 && !error && (
         <div className="flex items-center justify-center py-12 text-muted-foreground">
           <p>No violations found. Check back later for new data.</p>
