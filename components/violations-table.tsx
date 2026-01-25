@@ -169,43 +169,44 @@ export function ViolationsTable({
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent border-border">
-            <TableHead className="w-12">
-              <Checkbox
-                checked={allSelected}
-                onCheckedChange={toggleAll}
-                aria-label="Select all violations"
-                className={cn(someSelected && "data-[state=checked]:bg-primary/50")}
-                ref={(el) => {
-                  if (el) {
-                    (el as HTMLButtonElement & { indeterminate?: boolean }).indeterminate = someSelected
-                  }
-                }}
-              />
-            </TableHead>
-            <TableHead className="text-muted-foreground text-sm">
-              <SortIcon field="name" label="Product Name" />
-            </TableHead>
-            <TableHead className="text-muted-foreground text-sm">
-              <SortIcon field="site" label="Site" />
-            </TableHead>
-            <TableHead className="text-right text-muted-foreground text-sm">
-              <SortIcon field="umap_price" label="UMAP Price" />
-            </TableHead>
-            <TableHead className="text-right text-muted-foreground text-sm">
-              <SortIcon field="list_price" label="Observed" />
-            </TableHead>
-            <TableHead className="text-right text-muted-foreground text-sm">
-              <SortIcon field="per_diff" label="Difference" />
-            </TableHead>
-            <TableHead className="text-right text-muted-foreground text-sm">
-              <SortIcon field="date" label="Detected" />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent border-border">
+              <TableHead className="w-8 px-2">
+                <Checkbox
+                  checked={allSelected}
+                  onCheckedChange={toggleAll}
+                  aria-label="Select all violations"
+                  className={cn(someSelected && "data-[state=checked]:bg-primary/50")}
+                  ref={(el) => {
+                    if (el) {
+                      (el as HTMLButtonElement & { indeterminate?: boolean }).indeterminate = someSelected
+                    }
+                  }}
+                />
+              </TableHead>
+              <TableHead className="text-muted-foreground text-xs min-w-[120px] max-w-[200px]">
+                <SortIcon field="name" label="Product" />
+              </TableHead>
+              <TableHead className="text-muted-foreground text-xs w-[100px]">
+                <SortIcon field="site" label="Site" />
+              </TableHead>
+              <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
+                <SortIcon field="umap_price" label="UMAP" />
+              </TableHead>
+              <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
+                <SortIcon field="list_price" label="Observed" />
+              </TableHead>
+              <TableHead className="text-right text-muted-foreground text-xs w-[70px]">
+                <SortIcon field="per_diff" label="Diff %" />
+              </TableHead>
+              <TableHead className="text-right text-muted-foreground text-xs w-[90px]">
+                <SortIcon field="date" label="Date" />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
           {paginatedViolations.map((violation) => {
             const isFromDifferentSite = lockedSite && violation.site !== lockedSite
             const isDisabled = isFromDifferentSite && !selectedIds.has(String(violation.id))
@@ -233,7 +234,7 @@ export function ViolationsTable({
                 )}
                 onClick={handleRowClick}
               >
-                <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell>
+                <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell className="px-2">
                   <Checkbox
                     checked={selectedIds.has(String(violation.id))}
                     onCheckedChange={() => !isDisabled && toggleOne(String(violation.id))}
@@ -241,16 +242,18 @@ export function ViolationsTable({
                     disabled={isDisabled}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{violation.name || violation.umap_cleaned_name}</TableCell>
-                <TableCell className="text-muted-foreground">{violation.site}</TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {formatCurrency(violation.umap_price)}
+                <TableCell className="font-medium text-xs truncate max-w-[200px]" title={violation.name || violation.umap_cleaned_name}>
+                  {violation.name || violation.umap_cleaned_name}
                 </TableCell>
-                <TableCell className="text-right tabular-nums text-destructive">
-                  {formatCurrency(violation.list_price)}
+                <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
+                <TableCell className="text-right tabular-nums text-xs px-2">
+                  ${violation.umap_price.toFixed(0)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums text-destructive text-xs px-2">
+                  ${violation.list_price.toFixed(0)}
                 </TableCell>
                 <TableCell className={cn(
-                  "text-right tabular-nums font-medium",
+                  "text-right tabular-nums font-medium text-xs px-2",
                   (violation.per_diff === 0 || violation.per_diff >= 100)
                     ? "text-green-600"
                     : violation.per_diff > 0
@@ -259,14 +262,15 @@ export function ViolationsTable({
                 )}>
                   {violation.per_diff?.toFixed(1) || '0.0'}%
                 </TableCell>
-                <TableCell className="text-right text-muted-foreground">
-                  {formatDate(violation.date)}
+                <TableCell className="text-right text-muted-foreground text-xs px-2">
+                  {new Date(violation.date).toLocaleDateString("en-US", { month: "numeric", day: "numeric" })}
                 </TableCell>
               </TableRow>
             )
           })}
         </TableBody>
       </Table>
+      </div>
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background">

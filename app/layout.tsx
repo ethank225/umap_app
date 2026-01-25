@@ -2,7 +2,7 @@ import React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
-import { ConditionalTopNav } from "@/components/conditional-top-nav"
+import { TopNav } from "@/components/top-nav"
 import { ViolationsProvider } from "@/lib/violations-context"
 import "./globals.css"
 
@@ -41,7 +41,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans antialiased min-h-screen bg-background">
         <ViolationsProvider>
-          <ConditionalTopNav />
+          <TopNav />
           {children}
         </ViolationsProvider>
         <Analytics />
