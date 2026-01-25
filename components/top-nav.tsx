@@ -9,13 +9,13 @@ export function TopNav() {
 
   return (
     <>
-      <header className="border-b border-border bg-gradient-to-r from-blue-950 to-blue-900 shadow-lg">
+      <header className="border-b border-border bg-gradient-to-r from-slate-900 to-slate-800 shadow-lg">
         <div className="flex h-20 items-center justify-between px-8">
           <div className="flex items-center gap-4">
 
             <div className="flex flex-col">
               <span className="text-base font-bold text-white">UMAP Monitor</span>
-              <span className="text-sm text-blue-200">Price Compliance Dashboard</span>
+              <span className="text-sm text-slate-300">Price Compliance Dashboard</span>
             </div>
           </div>
 
@@ -28,7 +28,7 @@ export function TopNav() {
               Help
             </button>
 
-            <div className="text-sm text-blue-100 flex flex-col items-end">
+            <div className="text-sm text-slate-300 flex flex-col items-end">
               <span>Created by Ethan Kawahara</span>
               <a
                 href="mailto:ethan.kawahara@brooksrunning.com"
