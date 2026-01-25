@@ -48,8 +48,9 @@ export function TopNav() {
               <HelpCircle className="h-5 w-5 text-orange-500" />
               How to Use UMAP Monitor
             </DialogTitle>
+            <DialogDescription>Guide to using the UMAP price compliance dashboard</DialogDescription>
           </DialogHeader>
-          <DialogDescription className="space-y-4 text-foreground">
+          <div className="space-y-4 text-foreground">
             <div>
               <h3 className="font-semibold text-base mb-2">📊 Dashboard Overview</h3>
               <p className="text-sm">View price compliance metrics and identify violations across all retailers.</p>
@@ -74,7 +75,7 @@ export function TopNav() {
               <h3 className="font-semibold text-base mb-2">📧 Email Draft</h3>
               <p className="text-sm">Select violations and click "Draft Email" to generate a message template for retailer outreach.</p>
             </div>
-          </DialogDescription>
+          </div>
         </DialogContent>
       </Dialog>
     </>

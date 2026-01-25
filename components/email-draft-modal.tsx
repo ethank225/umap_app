@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Copy, Download, CheckCircle, Mail } from "lucide-react"
+import { Copy, Download, CheckCircle, Mail, Send } from "lucide-react"
 import type { Violation } from "@/types/violation"
 
 interface EmailDraftModalProps {
@@ -70,7 +70,7 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
     return generateEmailDraft(site, violations)
   }, [violations])
 
-  // Reset edited state when modal opens with new violations
+  // Always show the draft content
   const currentSubject = editedSubject ?? draft?.subject ?? ""
   const currentBody = editedBody ?? draft?.body ?? ""
 
@@ -81,6 +81,12 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
       setEditedBody(null)
     }
     onOpenChange(newOpen)
+  }
+
+  const sendEmail = () => {
+    if (!draft) return
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(currentSubject)}&body=${encodeURIComponent(currentBody)}`
+    window.location.href = mailtoLink
   }
 
   const copyToClipboard = async () => {
@@ -181,6 +187,14 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
         {/* Actions */}
         <div className="flex items-center justify-end gap-2 pt-4 border-t border-border shrink-0">
           <Button
+            size="sm"
+            onClick={sendEmail}
+            className="gap-2 bg-orange-500 hover:bg-orange-600"
+          >
+            <Send className="h-4 w-4" />
+            Send Email
+          </Button>
+          <Button
             variant="outline"
             size="sm"
             onClick={copyToClipboard}
@@ -194,7 +208,7 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             ) : (
               <>
                 <Copy className="h-4 w-4" />
-                Copy to Clipboard
+                Copy
               </>
             )}
           </Button>
@@ -207,12 +221,7 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             <Download className="h-4 w-4" />
             Download
           </Button>
-          <Button
-            size="sm"
-            onClick={() => handleOpenChange(false)}
-          >
-            Done
-          </Button>
+
         </div>
       </DialogContent>
     </Dialog>
