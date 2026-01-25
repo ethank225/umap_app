@@ -234,7 +234,7 @@ export function ViolationsTable({
                 </TableCell>
                 <TableCell className={cn(
                   "text-right tabular-nums font-medium text-xs px-2",
-                  (violation.per_diff > 0)
+                  (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
                     ? "text-destructive"
@@ -244,7 +244,7 @@ export function ViolationsTable({
                 </TableCell>
                 <TableCell className={cn(
                   "text-right tabular-nums font-medium text-xs px-2",
-                  (violation.per_diff > 0)
+                  (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
                     ? "text-destructive"
