@@ -152,7 +152,8 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
               id="subject"
               value={currentSubject}
               onChange={(e) => setEditedSubject(e.target.value)}
-              className="bg-secondary border-border"
+              className="bg-secondary border-border border-"
+
             />
           </div>
 
