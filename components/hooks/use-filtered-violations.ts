@@ -1,15 +1,5 @@
 import { useMemo } from "react"
-
-interface Violation {
-  id: number
-  name: string
-  umap_cleaned_name: string
-  site: string
-  gender: string
-  violation: boolean
-  per_diff: number
-  product_link: string
-}
+import type { Violation } from "@/types/violation"
 
 interface FiltersState {
   search: string

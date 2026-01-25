@@ -1,14 +1,5 @@
 import { useMemo } from "react"
-
-interface Violation {
-  id: number
-  site: string
-  name: string
-  umap_cleaned_name: string
-  product_link: string
-  violation: boolean
-  per_diff: number
-}
+import type { Violation } from "@/types/violation"
 
 interface ComplianceMetrics {
   sellersBreakinngUMAP: number

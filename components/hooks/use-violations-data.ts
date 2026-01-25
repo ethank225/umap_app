@@ -1,22 +1,5 @@
 import { useState, useEffect } from "react"
-
-interface Violation {
-  id: number
-  created_at: string
-  name: string
-  umap_cleaned_name: string
-  site: string
-  gender: string
-  umap_price: number
-  list_price: number
-  per_diff: number
-  violation: boolean
-  date: string
-  product_link: string
-  html_file: string
-  immersive_product_page_token: string
-  diff: number
-}
+import type { Violation } from "@/types/violation"
 
 interface UseViolationsReturn {
   violations: Violation[]

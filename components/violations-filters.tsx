@@ -13,18 +13,13 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import type { Violation } from "@/types/violation"
 
 interface FiltersState {
   search: string
   site: string
   gender: string
   violationsOnly: boolean
-}
-
-interface Violation {
-  site: string
-  gender: string
-  [key: string]: any
 }
 
 interface ViolationsFiltersProps {
