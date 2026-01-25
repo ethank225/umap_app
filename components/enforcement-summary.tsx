@@ -25,7 +25,6 @@ export function EnforcementSummary({ data }: EnforcementSummaryProps) {
                 <TableHead className="text-right">Violations</TableHead>
                 <TableHead className="text-right">Avg % Diff</TableHead>
                 <TableHead className="text-right">Max % Diff</TableHead>
-                <TableHead className="text-right">Products</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -37,7 +36,6 @@ export function EnforcementSummary({ data }: EnforcementSummaryProps) {
                   </TableCell>
                   <TableCell className="text-right">{item.avgPercentDiff.toFixed(2)}%</TableCell>
                   <TableCell className="text-right">{item.maxPercentDiff.toFixed(2)}%</TableCell>
-                  <TableCell className="text-right">{item.products}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
