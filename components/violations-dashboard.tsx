@@ -15,6 +15,7 @@ import { useFilteredViolations } from "./hooks/use-filtered-violations"
 import { useComplianceMetrics } from "./hooks/use-compliance-metrics"
 import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw } from "lucide-react"
 import { TableLoadingSkeleton } from "./table-loading-skeleton"
+import { EnforcementSummaryLoadingSkeleton } from "./enforcement-summary-skeleton"
 
 interface FiltersState {
   search: string
@@ -173,7 +174,11 @@ export function ViolationsDashboard() {
 
       {/* Enforcement Summary & Seller Donut */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <EnforcementSummary data={enforcementTableData} />
+        {isLoading ? (
+          <EnforcementSummaryLoadingSkeleton />
+        ) : (
+          <EnforcementSummary data={enforcementTableData} />
+        )}
         <ComplianceChart
           violatingCount={complianceMetrics.sellersBreakinngUMAP}
           compliantCount={complianceMetrics.sellersInCompliance}

@@ -14,12 +14,12 @@ interface EnforcementSummaryProps {
 
 export function EnforcementSummary({ data }: EnforcementSummaryProps) {
   return (
-    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-foreground mb-4">Enforcement Summary</h2>
+    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 flex flex-col max-h-[600px]">
+      <h2 className="text-lg font-semibold text-foreground mb-4 shrink-0">Enforcement Summary</h2>
       {data.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-y-auto flex-1">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 bg-card">
               <TableRow>
                 <TableHead>Site</TableHead>
                 <TableHead className="text-right">Violations</TableHead>
@@ -44,7 +44,7 @@ export function EnforcementSummary({ data }: EnforcementSummaryProps) {
           </Table>
         </div>
       ) : (
-        <div className="h-[300px] flex items-center justify-center text-muted-foreground">
+        <div className="flex items-center justify-center text-muted-foreground py-12">
           No violations found
         </div>
       )}
