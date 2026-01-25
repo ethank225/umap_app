@@ -1,0 +1,312 @@
+"use client"
+
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { cn } from "@/lib/utils"
+import { useState } from "react"
+import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+interface Violation {
+  id: number
+  created_at: string
+  name: string
+  umap_cleaned_name: string
+  site: string
+  umap_price: number
+  list_price: number
+  product_link: string
+  html_file: string
+  immersive_product_page_token: string
+  diff: number
+  per_diff: number
+  date: string
+  gender: string
+  violation: boolean
+}
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+type SortField = "name" | "site" | "umap_price" | "list_price" | "per_diff" | "date" | null
+type SortDirection = "asc" | "desc"
+
+interface ViolationsTableProps {
+  violations: Violation[]
+  selectedIds: Set<string>
+  onSelectionChange: (selectedIds: Set<string>) => void
+  lockedSite: string | null
+}
+
+export function ViolationsTable({
+  violations,
+  selectedIds,
+  onSelectionChange,
+  lockedSite,
+}: ViolationsTableProps) {
+  const [sortField, setSortField] = useState<SortField>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 50
+
+  // Filter violations to only those from the locked site (or all if no site locked)
+  const selectableViolations = lockedSite
+    ? violations.filter((v) => v.site === lockedSite)
+    : violations
+
+  // Sort violations
+  const sortedViolations = [...selectableViolations].sort((a, b) => {
+    if (!sortField) return 0
+
+    let aVal: any = a[sortField]
+    let bVal: any = b[sortField]
+
+    // Handle numeric comparisons
+    if (typeof aVal === "number" && typeof bVal === "number") {
+      return sortDirection === "asc" ? aVal - bVal : bVal - aVal
+    }
+
+    // Handle string comparisons
+    if (typeof aVal === "string" && typeof bVal === "string") {
+      return sortDirection === "asc"
+        ? aVal.localeCompare(bVal)
+        : bVal.localeCompare(aVal)
+    }
+
+    return 0
+  })
+
+  const allSelected =
+    sortedViolations.length > 0 && sortedViolations.every((v) => selectedIds.has(String(v.id)))
+  const someSelected = sortedViolations.some((v) => selectedIds.has(String(v.id))) && !allSelected
+
+  const toggleAll = () => {
+    if (allSelected) {
+      onSelectionChange(new Set())
+    } else {
+      onSelectionChange(new Set(sortedViolations.map((v) => String(v.id))))
+    }
+  }
+
+  const toggleOne = (id: string) => {
+    const newSet = new Set(selectedIds)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    onSelectionChange(newSet)
+  }
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1) // Reset to first page when sorting
+  }
+
+  // Pagination calculations
+  const totalPages = Math.ceil(sortedViolations.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedViolations = sortedViolations.slice(startIndex, endIndex)
+
+  const SortIcon = ({
+    field,
+    label,
+  }: {
+    field: SortField
+    label: string
+  }) => (
+    <button
+      onClick={() => handleSort(field)}
+      className="flex items-center gap-1 hover:text-foreground transition-colors"
+    >
+      {label}
+      {sortField === field ? (
+        sortDirection === "asc" ? (
+          <ArrowUp className="h-4 w-4" />
+        ) : (
+          <ArrowDown className="h-4 w-4" />
+        )
+      ) : (
+        <div className="h-4 w-4" />
+      )}
+    </button>
+  )
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(value)
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+  }
+
+  if (violations.length === 0) {
+    return (
+      <div className="bg-card border border-border rounded-lg p-12 text-center">
+        <p className="text-muted-foreground">No violations match your filters.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="hover:bg-transparent border-border">
+            <TableHead className="w-12">
+              <Checkbox
+                checked={allSelected}
+                onCheckedChange={toggleAll}
+                aria-label="Select all violations"
+                className={cn(someSelected && "data-[state=checked]:bg-primary/50")}
+                ref={(el) => {
+                  if (el) {
+                    (el as HTMLButtonElement & { indeterminate?: boolean }).indeterminate = someSelected
+                  }
+                }}
+              />
+            </TableHead>
+            <TableHead className="text-muted-foreground text-sm">
+              <SortIcon field="name" label="Product Name" />
+            </TableHead>
+            <TableHead className="text-muted-foreground text-sm">
+              <SortIcon field="site" label="Site" />
+            </TableHead>
+            <TableHead className="text-right text-muted-foreground text-sm">
+              <SortIcon field="umap_price" label="UMAP Price" />
+            </TableHead>
+            <TableHead className="text-right text-muted-foreground text-sm">
+              <SortIcon field="list_price" label="Observed" />
+            </TableHead>
+            <TableHead className="text-right text-muted-foreground text-sm">
+              <SortIcon field="per_diff" label="Difference" />
+            </TableHead>
+            <TableHead className="text-right text-muted-foreground text-sm">
+              <SortIcon field="date" label="Detected" />
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {paginatedViolations.map((violation) => {
+            const isFromDifferentSite = lockedSite && violation.site !== lockedSite
+            const isDisabled = isFromDifferentSite && !selectedIds.has(String(violation.id))
+
+            const handleRowClick = (e: React.MouseEvent) => {
+              // Check if clicking on checkbox or its cell
+              const target = e.target as HTMLElement
+              if (target.closest('[data-checkbox-cell]')) {
+                return
+              }
+
+              // Open product link in new tab
+              if (violation.product_link) {
+                window.open(violation.product_link, '_blank', 'noopener,noreferrer')
+              }
+            }
+
+            return (
+              <TableRow
+                key={violation.id}
+                className={cn(
+                  "border-border",
+                  selectedIds.has(String(violation.id)) && "bg-primary/5",
+                  isDisabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:bg-muted/50"
+                )}
+                onClick={handleRowClick}
+              >
+                <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell>
+                  <Checkbox
+                    checked={selectedIds.has(String(violation.id))}
+                    onCheckedChange={() => !isDisabled && toggleOne(String(violation.id))}
+                    aria-label={`Select ${violation.name || violation.umap_cleaned_name}`}
+                    disabled={isDisabled}
+                  />
+                </TableCell>
+                <TableCell className="font-medium">{violation.name || violation.umap_cleaned_name}</TableCell>
+                <TableCell className="text-muted-foreground">{violation.site}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {formatCurrency(violation.umap_price)}
+                </TableCell>
+                <TableCell className="text-right tabular-nums text-destructive">
+                  {formatCurrency(violation.list_price)}
+                </TableCell>
+                <TableCell className={cn(
+                  "text-right tabular-nums font-medium",
+                  (violation.per_diff === 0 || violation.per_diff >= 100)
+                    ? "text-green-600"
+                    : violation.per_diff > 0
+                    ? "text-destructive"
+                    : "text-destructive"
+                )}>
+                  {violation.per_diff?.toFixed(1) || '0.0'}%
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground">
+                  {formatDate(violation.date)}
+                </TableCell>
+              </TableRow>
+            )
+          })}
+        </TableBody>
+      </Table>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-background">
+        <div className="text-sm text-muted-foreground">
+          Showing {startIndex + 1} to {Math.min(endIndex, sortedViolations.length)} of {sortedViolations.length} results
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <Button
+                key={page}
+                variant={currentPage === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCurrentPage(page)}
+                className="w-8 h-8 p-0"
+              >
+                {page}
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
