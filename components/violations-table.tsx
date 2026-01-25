@@ -192,7 +192,7 @@ export function ViolationsTable({
           <TableBody>
           {paginatedViolations.map((violation) => {
             const isFromDifferentSite = lockedSite && violation.site !== lockedSite
-            const isDisabled = isFromDifferentSite && !selectedIds.has(String(violation.id))
+            const isDisabled = Boolean(isFromDifferentSite && !selectedIds.has(String(violation.id)))
 
             const handleRowClick = (e: React.MouseEvent) => {
               // Check if clicking on checkbox or its cell
