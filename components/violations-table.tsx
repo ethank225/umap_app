@@ -47,6 +47,13 @@ export function ViolationsTable({
   const sortedViolations = [...selectableViolations].sort((a, b) => {
     if (!sortField) return 0
 
+    // Special handling for dates so we fallback to created_at when date is missing
+    if (sortField === "date") {
+      const aDate = new Date(a.date || a.created_at).getTime()
+      const bDate = new Date(b.date || b.created_at).getTime()
+      return sortDirection === "asc" ? aDate - bDate : bDate - aDate
+    }
+
     let aVal: any = a[sortField]
     let bVal: any = b[sortField]
 
@@ -253,7 +260,14 @@ export function ViolationsTable({
                   {violation.per_diff?.toFixed(2) || '0.0'}%
                 </TableCell>
                 <TableCell className="text-left text-muted-foreground text-xs px-2">
-                  {new Date(violation.date).toLocaleDateString("en-US", { month: "numeric", day: "numeric" })}
+                  {(() => {
+                    const rawDate = violation.date || violation.created_at
+                    if (!rawDate) return "--"
+                    const d = new Date(rawDate)
+                    return isNaN(d.getTime())
+                      ? "--"
+                      : d.toLocaleDateString("en-US", { month: "numeric", day: "numeric", timeZone: "UTC" })
+                  })()}
                 </TableCell>
               </TableRow>
             )
