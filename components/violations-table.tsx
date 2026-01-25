@@ -229,11 +229,11 @@ export function ViolationsTable({
                   {violation.name || violation.umap_cleaned_name}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
-                <TableCell className="text-right tabular-nums text-xs px-2">
+                <TableCell className="text-left tabular-nums text-xs px-2">
                   ${violation.umap_price.toFixed(2)}
                 </TableCell>
                 <TableCell className={cn(
-                  "text-right tabular-nums font-medium text-xs px-2",
+                  "text-left tabular-nums font-medium text-xs px-2",
                   (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
@@ -243,7 +243,7 @@ export function ViolationsTable({
                   ${violation.list_price.toFixed(2)}
                 </TableCell>
                 <TableCell className={cn(
-                  "text-right tabular-nums font-medium text-xs px-2",
+                  "text-left tabular-nums font-medium text-xs px-2",
                   (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
@@ -252,7 +252,7 @@ export function ViolationsTable({
                 )}>
                   {violation.per_diff?.toFixed(2) || '0.0'}%
                 </TableCell>
-                <TableCell className="text-right text-muted-foreground text-xs px-2">
+                <TableCell className="text-left text-muted-foreground text-xs px-2">
                   {new Date(violation.date).toLocaleDateString("en-US", { month: "numeric", day: "numeric" })}
                 </TableCell>
               </TableRow>
