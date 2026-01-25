@@ -101,7 +101,7 @@ export function ViolationsDashboard() {
         counts[v.site] = new Set()
       }
       // Create unique listing identifier
-      const listingId = `${v.site}||${v.productName}||${v.productUrl}`
+      const listingId = `${v.site}||${v.name || v.umap_cleaned_name}||${v.product_link}`
       counts[v.site].add(listingId)
     }
 
