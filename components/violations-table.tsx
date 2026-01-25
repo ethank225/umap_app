@@ -230,20 +230,27 @@ export function ViolationsTable({
                 </TableCell>
                 <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
                 <TableCell className="text-right tabular-nums text-xs px-2">
-                  ${violation.umap_price.toFixed(0)}
-                </TableCell>
-                <TableCell className="text-right tabular-nums text-destructive text-xs px-2">
-                  ${violation.list_price.toFixed(0)}
+                  ${violation.umap_price.toFixed(2)}
                 </TableCell>
                 <TableCell className={cn(
                   "text-right tabular-nums font-medium text-xs px-2",
-                  (violation.per_diff === 0 || violation.per_diff >= 100)
+                  (violation.per_diff > 0)
                     ? "text-green-600"
-                    : violation.per_diff > 0
+                    : violation.per_diff < 0
                     ? "text-destructive"
                     : "text-destructive"
                 )}>
-                  {violation.per_diff?.toFixed(1) || '0.0'}%
+                  ${violation.list_price.toFixed(2)}
+                </TableCell>
+                <TableCell className={cn(
+                  "text-right tabular-nums font-medium text-xs px-2",
+                  (violation.per_diff > 0)
+                    ? "text-green-600"
+                    : violation.per_diff < 0
+                    ? "text-destructive"
+                    : "text-destructive"
+                )}>
+                  {violation.per_diff?.toFixed(2) || '0.0'}%
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground text-xs px-2">
                   {new Date(violation.date).toLocaleDateString("en-US", { month: "numeric", day: "numeric" })}
