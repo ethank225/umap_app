@@ -10,31 +10,32 @@ export function TopNav() {
   return (
     <>
       <header className="border-b border-border bg-gradient-to-r from-slate-900 to-slate-800 shadow-lg">
-        <div className="flex h-20 items-center justify-between px-8">
-          <div className="flex items-center gap-4">
+        <div className="flex min-h-[60px] sm:h-20 items-center justify-between px-3 sm:px-8 py-3 gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 sm:gap-4">
 
             <div className="flex flex-col">
-              <span className="text-base font-bold text-white">UMAP Monitor</span>
-              <span className="text-sm text-slate-300">Price Compliance Dashboard</span>
+              <span className="text-sm sm:text-base font-bold text-white">UMAP Monitor</span>
+              <span className="text-xs sm:text-sm text-slate-300">Price Compliance Dashboard</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               onClick={() => setShowHelp(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors text-white font-medium text-sm shadow-lg hover:shadow-orange-500/50"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors text-white font-medium text-xs sm:text-sm shadow-lg hover:shadow-orange-500/50"
             >
-              <HelpCircle className="h-4 w-4" />
-              Help
+              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Help</span>
             </button>
 
-            <div className="text-sm text-slate-300 flex flex-col items-end">
-              <span>Created by Ethan Kawahara</span>
+            <div className="text-xs sm:text-sm text-slate-300 flex flex-col items-end">
+              <span className="hidden sm:inline">Created by Ethan Kawahara</span>
               <a
                 href="mailto:ethan.kawahara@brooksrunning.com"
                 className="text-orange-300 hover:text-orange-200 transition-colors"
               >
-                Send feedback
+                <span className="hidden sm:inline">Send feedback</span>
+                <span className="sm:hidden">Feedback</span>
               </a>
             </div>
           </div>
