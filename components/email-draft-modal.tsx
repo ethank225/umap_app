@@ -24,16 +24,23 @@ interface EmailDraftModalProps {
 function generateEmailDraft(site: string, violations: Violation[]) {
   const violationsList = violations
     .map(
-      (v) =>
-        `- ${v.name || v.umap_cleaned_name}
+      (v) => {
+        const rawDate = v.date || v.created_at
+        const dateStr = rawDate
+          ? new Date(rawDate).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+              timeZone: "UTC",
+            })
+          : "Date unavailable"
+
+        return `- ${v.name || v.umap_cleaned_name}
   Observed Price: $${v.list_price.toFixed(2)}
   UMAP Price: $${v.umap_price.toFixed(2)}
   Link: ${v.product_link}
-  Date Detected: ${new Date(v.date).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  })}`
+  Date Detected: ${dateStr}`
+      }
     )
     .join("\n\n")
 
