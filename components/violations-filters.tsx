@@ -61,7 +61,7 @@ export function ViolationsFilters({ filters, onFiltersChange, violations }: Viol
     <div className="bg-card border border-border rounded-lg p-4">
       <div className="flex flex-wrap items-end gap-4">
         {/* Search */}
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[180px]">
           <Label htmlFor="search" className="text-xs text-muted-foreground mb-1.5 block">
             Search Product
           </Label>

@@ -189,39 +189,11 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
           <Button
             size="sm"
             onClick={sendEmail}
-            className="gap-2 bg-orange-500 hover:bg-orange-600"
+            className="gap-2 bg-orange-500 hover:bg-orange-800 text-white"
           >
             <Send className="h-4 w-4" />
             Send Email
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyToClipboard}
-            className="gap-2 bg-transparent"
-          >
-            {copied ? (
-              <>
-                <CheckCircle className="h-4 w-4 text-emerald-400" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4" />
-                Copy
-              </>
-            )}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={downloadAsTxt}
-            className="gap-2 bg-transparent"
-          >
-            <Download className="h-4 w-4" />
-            Download
-          </Button>
-
         </div>
       </DialogContent>
     </Dialog>
