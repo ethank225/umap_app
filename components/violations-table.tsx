@@ -36,7 +36,7 @@ export function ViolationsTable({
   const [sortField, setSortField] = useState<SortField>(null)
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 20
+  const itemsPerPage = 15
 
   // Filter violations to only those from the locked site (or all if no site locked)
   const selectableViolations = lockedSite
