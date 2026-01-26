@@ -20,14 +20,6 @@ export function TopNav() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              onClick={() => setShowHelp(true)}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors text-white font-medium text-xs sm:text-sm shadow-lg hover:shadow-orange-500/50"
-            >
-              <HelpCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Help</span>
-            </button>
-
             <div className="text-xs sm:text-sm text-slate-300 flex flex-col items-end">
               <span className="hidden sm:inline">Created by Ethan Kawahara</span>
               <a
