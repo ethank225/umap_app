@@ -23,14 +23,14 @@ export function ComplianceChart({ violatingCount, compliantCount }: ComplianceCh
       <h2 className="text-lg font-semibold text-foreground mb-4 shrink-0">Sellers Status</h2>
       {violatingCount > 0 || compliantCount >= 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center">
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={40}
-                outerRadius={80}
+                innerRadius={50}
+                outerRadius={120}
                 paddingAngle={0}
                 dataKey="value"
                 labelLine={false}
@@ -39,7 +39,6 @@ export function ComplianceChart({ violatingCount, compliantCount }: ComplianceCh
                 <Cell fill="#ef4444" /> {/* Red for violating */}
                 <Cell fill="#22c55e" /> {/* Green for compliant */}
               </Pie>
-              <Tooltip formatter={(value) => `${value} sellers`} />
             </PieChart>
           </ResponsiveContainer>
           <div className="flex justify-center gap-4 mt-4 text-sm shrink-0">
