@@ -213,9 +213,9 @@ export function ViolationsDashboard() {
         </div>
       )}
 
-      {/* Site Error Alert */}
+      {/* Site Error Alert - Fixed Overlay */}
       {siteError && (
-        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+        <div className="fixed top-4 left-4 right-4 z-50 flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4 max-w-2xl">
           <XCircle className="h-5 w-5 text-destructive shrink-0" />
           <p className="text-sm text-destructive flex-1">{siteError}</p>
           <Button
@@ -230,7 +230,7 @@ export function ViolationsDashboard() {
       )}
 
       {/* Results count and current site indicator */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between min-h-[28px]">
         <div>
           {currentSite && selectedIds.size > 0 && (
             <div className="flex items-center gap-2 text-sm">

@@ -224,12 +224,13 @@ export function ViolationsTable({
                 )}
                 onClick={handleRowClick}
               >
-                <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell className="px-2">
+                <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell className="px-2 w-8 h-10">
                   <Checkbox
                     checked={selectedIds.has(String(violation.id))}
                     onCheckedChange={() => !isDisabled && toggleOne(String(violation.id))}
                     aria-label={`Select ${violation.name || violation.umap_cleaned_name}`}
                     disabled={isDisabled}
+                    className="w-4 h-4"
                   />
                 </TableCell>
                 <TableCell className="font-medium text-xs truncate max-w-[200px]" title={violation.name || violation.umap_cleaned_name}>
