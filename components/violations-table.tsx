@@ -3,8 +3,8 @@
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
-import { useState } from "react"
-import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react"
+import { useState, useEffect } from "react"
+import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Violation } from "@/types/violation"
 
@@ -37,6 +37,11 @@ export function ViolationsTable({
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 15
+
+  // Reset to first page when violations data changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [violations.length])
 
   // Filter violations to only those from the locked site (or all if no site locked)
   const selectableViolations = lockedSite
@@ -149,6 +154,36 @@ export function ViolationsTable({
     })
   }
 
+  const exportToExcel = () => {
+    // Create CSV content
+    const headers = ["Product", "Site", "UMAP", "Observed", "Diff %", "Date"]
+    const rows = sortedViolations.map((v) => [
+      v.name || v.umap_cleaned_name,
+      v.site,
+      v.umap_price.toFixed(2),
+      v.list_price.toFixed(2),
+      v.per_diff?.toFixed(2) || "0.0",
+      new Date(v.date || v.created_at).toLocaleDateString("en-US"),
+    ])
+
+    // Create CSV string
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n")
+
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `violations-${new Date().toISOString().split("T")[0]}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   if (violations.length === 0) {
     return (
       <div className="bg-card border border-border rounded-lg p-12 text-center">
@@ -159,6 +194,18 @@ export function ViolationsTable({
 
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        <h3 className="text-sm font-medium text-foreground">Violations Table</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportToExcel}
+          className="gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Export CSV
+        </Button>
+      </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
