@@ -289,22 +289,9 @@ export function ViolationsTable({
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 mr-2" />
+            Back
           </Button>
-
-          <div className="flex items-center gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "default" : "outline"}
-                size="sm"
-                onClick={() => setCurrentPage(page)}
-                className="w-8 h-8 p-0"
-              >
-                {page}
-              </Button>
-            ))}
-          </div>
 
           <Button
             variant="outline"
@@ -312,7 +299,8 @@ export function ViolationsTable({
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
           >
-            <ChevronRight className="h-4 w-4" />
+            Next
+            <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
       </div>
