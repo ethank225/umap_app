@@ -96,6 +96,7 @@ export function ViolationsDashboard() {
   }
 
   const handleSiteClick = (site: string) => {
+    handleClearSelection()
     setFilters(prev => ({ ...prev, site }))
   }
 
