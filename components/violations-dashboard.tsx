@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ViolationsFilters } from "./violations-filters"
 import { ViolationsTable } from "./violations-table"
@@ -66,7 +66,7 @@ export function ViolationsDashboard() {
 
       // Check if trying to select from multiple sites
       if (sites.size > 1) {
-        setSiteError("You can only select violations from one site at a time. Clear your selection to choose a different site.")
+        setSiteError("You can only select violations from one site at a time!")
         return
       }
 
@@ -90,6 +90,16 @@ export function ViolationsDashboard() {
     setCurrentSite(null)
     setSiteError(null)
   }
+
+  // Auto-dismiss site error after 4 seconds
+  useEffect(() => {
+    if (siteError) {
+      const timer = setTimeout(() => {
+        setSiteError(null)
+      }, 4000)
+      return () => clearTimeout(timer)
+    }
+  }, [siteError])
 
   const handleDraftEmail = () => {
     setIsEmailModalOpen(true)
@@ -213,19 +223,11 @@ export function ViolationsDashboard() {
         </div>
       )}
 
-      {/* Site Error Alert - Fixed Overlay */}
+      {/* Site Error Alert */}
       {siteError && (
-        <div className="fixed top-4 left-4 right-4 z-50 flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4 max-w-2xl">
+        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
           <XCircle className="h-5 w-5 text-destructive shrink-0" />
           <p className="text-sm text-destructive flex-1">{siteError}</p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearSelection}
-            className="shrink-0 border-destructive/30 text-destructive hover:bg-destructive/10 bg-transparent"
-          >
-            Clear Selection
-          </Button>
         </div>
       )}
 
