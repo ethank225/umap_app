@@ -6,7 +6,7 @@ export async function GET() {
     const supabase = await createClient()
 
     // Fetch all records with pagination (Supabase limits to 1000 per request)
-    let allData = []
+    let allData: any[] = []
     let page = 0
     const pageSize = 1000
 
