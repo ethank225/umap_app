@@ -95,6 +95,10 @@ export function ViolationsDashboard() {
     setIsEmailModalOpen(true)
   }
 
+  const handleSiteClick = (site: string) => {
+    setFilters(prev => ({ ...prev, site }))
+  }
+
   // Count violations by site (unique listings per site)
   const siteBreakdown = useMemo(() => {
     const counts: Record<string, Set<string>> = {}
@@ -177,7 +181,7 @@ export function ViolationsDashboard() {
         {isLoading ? (
           <EnforcementSummaryLoadingSkeleton />
         ) : (
-          <EnforcementSummary data={enforcementTableData} />
+          <EnforcementSummary data={enforcementTableData} onSiteClick={handleSiteClick} />
         )}
         <ComplianceChart
           violatingCount={complianceMetrics.sellersBreakinngUMAP}

@@ -10,11 +10,12 @@ interface EnforcementItem {
 
 interface EnforcementSummaryProps {
   data: EnforcementItem[]
+  onSiteClick?: (site: string) => void
 }
 
-export function EnforcementSummary({ data }: EnforcementSummaryProps) {
+export function EnforcementSummary({ data, onSiteClick }: EnforcementSummaryProps) {
   return (
-    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 flex flex-col max-h-[600px]">
+    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 flex flex-col max-h-[400px]">
       <h2 className="text-lg font-semibold text-foreground mb-4 shrink-0">Enforcement Summary</h2>
       {data.length > 0 ? (
         <div className="overflow-y-auto flex-1">
@@ -29,7 +30,11 @@ export function EnforcementSummary({ data }: EnforcementSummaryProps) {
             </TableHeader>
             <TableBody>
               {data.map((item) => (
-                <TableRow key={item.site}>
+                <TableRow
+                  key={item.site}
+                  className={onSiteClick ? "cursor-pointer hover:bg-muted/50" : ""}
+                  onClick={() => onSiteClick?.(item.site)}
+                >
                   <TableCell className="font-medium">{item.site}</TableCell>
                   <TableCell className="text-right text-destructive font-semibold">
                     {item.violations}

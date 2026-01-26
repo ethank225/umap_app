@@ -11,23 +11,21 @@ interface ComplianceMetrics {
 
 export function useComplianceMetrics(violations: Violation[]): ComplianceMetrics {
   return useMemo(() => {
-    const sellersWithViolations = new Set<string>()
-    const sellersWithOnlyCompliantListings = new Set<string>()
-    const allSellers = new Set<string>()
+    let sellersWithViolations = new Set<string>()
+    let sellersWithOnlyCompliantListings = new Set<string>()
+    let allSellers = new Set<string>()
 
-    const violatingListingIds = new Set<string>()
-    const compliantListingIds = new Set<string>()
+    let violatingListings = 0
+    let compliantListings = 0
 
     for (const v of violations) {
       allSellers.add(v.site)
-      const productName = v.name || v.umap_cleaned_name
-      const listingId = `${v.site}||${productName}||${v.product_link}`
 
       if (v.violation) {
-        violatingListingIds.add(listingId)
+        violatingListings += 1
         sellersWithViolations.add(v.site)
       } else {
-        compliantListingIds.add(listingId)
+        compliantListings += 1
       }
     }
 
@@ -40,9 +38,9 @@ export function useComplianceMetrics(violations: Violation[]): ComplianceMetrics
     return {
       sellersBreakinngUMAP: sellersWithViolations.size,
       sellersInCompliance: sellersWithOnlyCompliantListings.size,
-      listingsBreakingUMAP: violatingListingIds.size,
-      listingsInCompliance: compliantListingIds.size,
-      totalListings: violatingListingIds.size + compliantListingIds.size,
+      listingsBreakingUMAP: violatingListings,
+      listingsInCompliance: compliantListings,
+      totalListings: violatingListings + compliantListings,
     }
   }, [violations])
 }

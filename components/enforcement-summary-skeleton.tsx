@@ -1,6 +1,6 @@
 export function EnforcementSummaryLoadingSkeleton() {
   return (
-    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 flex flex-col max-h-[600px]">
+    <div className="lg:col-span-2 bg-card border border-border rounded-lg p-6 flex flex-col max-h-[400px]">
       <div className="h-6 bg-muted rounded w-32 mb-4 animate-pulse shrink-0" />
 
       <div className="overflow-y-auto flex-1 space-y-2">
