@@ -230,24 +230,25 @@ export function ViolationsDashboard() {
 
       {/* Results count and current site indicator */}
       <div className="flex items-center justify-between">
-
-        {currentSite && selectedIds.size > 0 && (
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Selecting from:</span>
-            <span className="font-medium text-primary">{currentSite}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClearSelection}
-              className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-            >
-              Clear
-            </Button>
-          </div>
-        )}
+        <div>
+          {currentSite && selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Selecting from:</span>
+              <span className="font-medium text-primary">{currentSite}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearSelection}
+                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                Clear
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Data update status */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground ml-auto">
           <RefreshCw className="h-3 w-3" />
           <span>Updated daily</span>
         </div>

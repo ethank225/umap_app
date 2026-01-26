@@ -1,27 +1,19 @@
 export function TableLoadingSkeleton() {
   return (
-    <div className="bg-card border border-border rounded-lg overflow-hidden p-4 space-y-3">
-      {/* Header row */}
-      <div className="grid grid-cols-7 gap-2 mb-4">
-        {[...Array(7)].map((_, i) => (
-          <div key={i} className="h-4 bg-muted rounded animate-pulse" />
-        ))}
-      </div>
+    <div className="bg-card border border-border rounded-lg overflow-hidden p-6 flex flex-col">
+      {/* Title skeleton */}
+      <div className="h-6 bg-muted rounded w-32 mb-4 animate-pulse shrink-0" />
 
-      {/* Data rows */}
-      {[...Array(5)].map((_, rowIdx) => (
-        <div key={rowIdx} className="grid grid-cols-7 gap-2">
-          {[...Array(7)].map((_, colIdx) => (
-            <div
-              key={colIdx}
-              className="h-8 bg-muted rounded animate-pulse"
-              style={{
-                animationDelay: `${(rowIdx * 7 + colIdx) * 50}ms`
-              }}
-            />
-          ))}
+      {/* Chart skeleton */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="w-40 h-40 rounded-full bg-muted animate-pulse mb-4" />
+
+        {/* Legend skeleton */}
+        <div className="flex justify-center gap-4">
+          <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-24 bg-muted rounded animate-pulse" />
         </div>
-      ))}
+      </div>
     </div>
   )
 }
