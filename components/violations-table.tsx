@@ -163,7 +163,7 @@ export function ViolationsTable({
       v.umap_price.toFixed(2),
       v.list_price.toFixed(2),
       v.per_diff?.toFixed(2) || "0.0",
-      new Date(v.date || v.created_at).toLocaleDateString("en-US"),
+      v.date || v.created_at, // Use raw date from API
     ])
 
     // Create CSV string
@@ -172,12 +172,17 @@ export function ViolationsTable({
       ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
     ].join("\n")
 
+    // Get raw date from first violation for filename
+    const exportDate = sortedViolations.length > 0
+      ? (sortedViolations[0].date || sortedViolations[0].created_at)?.split("T")[0]
+      : new Date().toISOString().split("T")[0]
+
     // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
     link.setAttribute("href", url)
-    link.setAttribute("download", `violations-${new Date().toISOString().split("T")[0]}.csv`)
+    link.setAttribute("download", `violations-${exportDate}.csv`)
     link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()
