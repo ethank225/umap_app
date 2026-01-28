@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Copy, Download, CheckCircle, Mail, Send } from "lucide-react"
+import { Copy, Download, CheckCircle, Mail, Send, X, Image } from "lucide-react"
 import type { Violation } from "@/types/violation"
 
 interface EmailDraftModalProps {
@@ -21,7 +21,39 @@ interface EmailDraftModalProps {
   violations: Violation[]
 }
 
+interface ScreenshotData {
+  token: string
+  dataUrl: string
+}
+
+interface ExpandedScreenshot {
+  token: string
+  dataUrl: string
+}
+
+async function fetchScreenshot(token: string): Promise<string | null> {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pmtnbpuivcvebqlnevwm.supabase.co"
+    const screenshotUrl = `${supabaseUrl}/storage/v1/object/public/images/screenshots/${token}.png`
+
+    const response = await fetch(screenshotUrl)
+    if (!response.ok) return null
+
+    const blob = await response.blob()
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result as string)
+      reader.readAsDataURL(blob)
+    })
+  } catch (error) {
+    console.error(`Error fetching screenshot for token ${token}:`, error)
+    return null
+  }
+}
+
 function generateEmailDraft(site: string, violations: Violation[]) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pmtnbpuivcvebqlnevwm.supabase.co"
+
   const violationsList = violations
     .map(
       (v) => {
@@ -35,11 +67,15 @@ function generateEmailDraft(site: string, violations: Violation[]) {
             })
           : "Date unavailable"
 
+        const screenshotUrl = v.immersive_product_page_token
+          ? `${supabaseUrl}/storage/v1/object/public/images/screenshots/${v.immersive_product_page_token}.png`
+          : null
+
         return `- ${v.name || v.umap_cleaned_name}
   Observed Price: $${v.list_price.toFixed(2)}
   UMAP Price: $${v.umap_price.toFixed(2)}
   Link: ${v.product_link}
-  Date Detected: ${dateStr}`
+  Date Detected: ${dateStr}${screenshotUrl ? `\n  Screenshot: ${screenshotUrl}` : ""}`
       }
     )
     .join("\n\n")
@@ -69,6 +105,33 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
   const [copied, setCopied] = useState(false)
   const [editedSubject, setEditedSubject] = useState<string | null>(null)
   const [editedBody, setEditedBody] = useState<string | null>(null)
+  const [screenshots, setScreenshots] = useState<ScreenshotData[]>([])
+  const [loadingScreenshots, setLoadingScreenshots] = useState(false)
+  const [expandedScreenshot, setExpandedScreenshot] = useState<ExpandedScreenshot | null>(null)
+
+  // Load screenshots when modal opens
+  useEffect(() => {
+    if (!open || violations.length === 0) {
+      setScreenshots([])
+      return
+    }
+
+    setLoadingScreenshots(true)
+    const loadScreenshots = async () => {
+      const screenshotPromises = violations
+        .filter((v) => v.immersive_product_page_token)
+        .map(async (v) => {
+          const dataUrl = await fetchScreenshot(v.immersive_product_page_token!)
+          return dataUrl ? { token: v.immersive_product_page_token!, dataUrl } : null
+        })
+
+      const results = await Promise.all(screenshotPromises)
+      setScreenshots(results.filter((s) => s !== null) as ScreenshotData[])
+      setLoadingScreenshots(false)
+    }
+
+    loadScreenshots()
+  }, [open, violations])
 
   // Since we only allow one site at a time, we can generate a single draft
   const draft = useMemo(() => {
@@ -86,6 +149,7 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
       // Reset edited state when closing
       setEditedSubject(null)
       setEditedBody(null)
+      setExpandedScreenshot(null)
     }
     onOpenChange(newOpen)
   }
@@ -177,6 +241,44 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             />
           </div>
 
+          {/* Screenshots */}
+          {screenshots.length > 0 && (
+            <div className="pt-4 border-t border-border">
+              <Label className="text-sm text-muted-foreground mb-3 block">
+                Screenshots ({screenshots.length} of {violations.length})
+              </Label>
+              <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto">
+                {screenshots.map((screenshot) => (
+                  <div
+                    key={screenshot.token}
+                    className="border border-border rounded p-2 cursor-pointer hover:bg-secondary/50 transition-colors"
+                    onClick={() => setExpandedScreenshot(screenshot)}
+                  >
+                    <img
+                      src={screenshot.dataUrl}
+                      alt={`Screenshot for ${screenshot.token}`}
+                      className="w-full h-auto rounded"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1 truncate">{screenshot.token}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {loadingScreenshots && (
+            <div className="text-sm text-muted-foreground">Loading screenshots...</div>
+          )}
+
+          {!loadingScreenshots && screenshots.length === 0 && violations.length > 0 && (
+            <div className="pt-4 border-t border-border">
+              <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <Image className="h-4 w-4 text-yellow-600 shrink-0" />
+                <p className="text-xs text-yellow-800">Some products don't have screenshots available</p>
+              </div>
+            </div>
+          )}
+
           {/* Violations Summary */}
           <div className="pt-4 border-t border-border">
             <Label className="text-sm text-muted-foreground mb-2 block">
@@ -203,6 +305,29 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             Send Email
           </Button>
         </div>
+
+        {/* Expanded Screenshot Modal */}
+        {expandedScreenshot && (
+          <div
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+            onClick={() => setExpandedScreenshot(null)}
+          >
+            <div className="relative max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setExpandedScreenshot(null)}
+                className="absolute -top-10 right-0 text-white hover:text-gray-300"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              <img
+                src={expandedScreenshot.dataUrl}
+                alt="Expanded screenshot"
+                className="w-full h-auto rounded-lg"
+              />
+              <p className="text-sm text-gray-300 mt-3 text-center truncate">{expandedScreenshot.token}</p>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

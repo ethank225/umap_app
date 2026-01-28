@@ -38,15 +38,24 @@ export function ViolationsTable({
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 15
 
+  // Deduplicate violations by name
+  const deduplicatedViolations = violations.reduce((acc, violation) => {
+    const violationName = violation.name || violation.umap_cleaned_name
+    if (!acc.find((v) => (v.name || v.umap_cleaned_name) === violationName)) {
+      acc.push(violation)
+    }
+    return acc
+  }, [] as Violation[])
+
   // Reset to first page when violations data changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [violations.length])
+  }, [deduplicatedViolations.length])
 
   // Filter violations to only those from the locked site (or all if no site locked)
   const selectableViolations = lockedSite
-    ? violations.filter((v) => v.site === lockedSite)
-    : violations
+    ? deduplicatedViolations.filter((v) => v.site === lockedSite)
+    : deduplicatedViolations
 
   // Sort violations
   const sortedViolations = [...selectableViolations].sort((a, b) => {

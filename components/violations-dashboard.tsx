@@ -34,6 +34,17 @@ export function ViolationsDashboard() {
 
   const { violations, isLoading, error } = useViolationsData()
 
+  // Deduplicate violations by name to match table behavior
+  const deduplicatedViolations = useMemo(() => {
+    return violations.reduce((acc, violation) => {
+      const violationName = violation.name || violation.umap_cleaned_name
+      if (!acc.find((v) => (v.name || v.umap_cleaned_name) === violationName)) {
+        acc.push(violation)
+      }
+      return acc
+    }, [] as Violation[])
+  }, [violations])
+
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false)
   const [siteError, setSiteError] = useState<string | null>(null)
   const [filters, setFilters] = useState<FiltersState>({
@@ -43,12 +54,12 @@ export function ViolationsDashboard() {
     violationsOnly: true,
   })
 
-  const { filteredViolations, enforcementTableData } = useFilteredViolations(violations, filters)
-  const complianceMetrics = useComplianceMetrics(violations)
+  const { filteredViolations, enforcementTableData } = useFilteredViolations(deduplicatedViolations, filters)
+  const complianceMetrics = useComplianceMetrics(deduplicatedViolations)
 
   const selectedViolationsList = useMemo(() => {
-    return violations.filter((v) => selectedIds.has(String(v.id)))
-  }, [selectedIds, violations])
+    return deduplicatedViolations.filter((v) => selectedIds.has(String(v.id)))
+  }, [selectedIds, deduplicatedViolations])
 
   const handleSelectionChange = useCallback(
     (newIds: Set<string>) => {
@@ -61,7 +72,7 @@ export function ViolationsDashboard() {
       }
 
       // Get the violations being selected
-      const newViolations = violations.filter((v) => newIds.has(String(v.id)))
+      const newViolations = deduplicatedViolations.filter((v) => newIds.has(String(v.id)))
       const sites = new Set(newViolations.map((v) => v.site))
 
       // Check if trying to select from multiple sites
@@ -82,7 +93,7 @@ export function ViolationsDashboard() {
       setSelectedIds(newIds)
       setCurrentSite(selectedSite)
     },
-    [currentSite, setSelectedIds, setCurrentSite, violations]
+    [currentSite, setSelectedIds, setCurrentSite, deduplicatedViolations]
   )
 
   const handleClearSelection = () => {
@@ -113,7 +124,7 @@ export function ViolationsDashboard() {
   // Count violations by site (unique listings per site)
   const siteBreakdown = useMemo(() => {
     const counts: Record<string, Set<string>> = {}
-    for (const v of violations) {
+    for (const v of deduplicatedViolations) {
       if (!counts[v.site]) {
         counts[v.site] = new Set()
       }
@@ -127,7 +138,7 @@ export function ViolationsDashboard() {
       acc[site] = set.size
       return acc
     }, {} as Record<string, number>)
-  }, [violations])
+  }, [deduplicatedViolations])
 
   // Calculate compliance metrics
 
