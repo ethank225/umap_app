@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Copy, Download, CheckCircle, Mail, Send, X, Image } from "lucide-react"
 import type { Violation } from "@/types/violation"
+import JSZip from "jszip"
 
 interface EmailDraftModalProps {
   open: boolean
@@ -52,7 +53,7 @@ async function fetchScreenshot(token: string): Promise<string | null> {
 }
 
 function generateEmailDraft(site: string, violations: Violation[]) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pmtnbpuivcvebqlnevwm.supabase.co"
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 
   const violationsList = violations
     .map(
@@ -67,15 +68,11 @@ function generateEmailDraft(site: string, violations: Violation[]) {
             })
           : "Date unavailable"
 
-        const screenshotUrl = v.immersive_product_page_token
-          ? `${supabaseUrl}/storage/v1/object/public/images/screenshots/${v.immersive_product_page_token}.png`
-          : null
-
         return `- ${v.name || v.umap_cleaned_name}
   Observed Price: $${v.list_price.toFixed(2)}
   UMAP Price: $${v.umap_price.toFixed(2)}
   Link: ${v.product_link}
-  Date Detected: ${dateStr}${screenshotUrl ? `\n  Screenshot: ${screenshotUrl}` : ""}`
+  Date Detected: ${dateStr}`
       }
     )
     .join("\n\n")
@@ -158,6 +155,34 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
     if (!draft) return
     const mailtoLink = `mailto:?subject=${encodeURIComponent(currentSubject)}&body=${encodeURIComponent(currentBody)}`
     window.location.href = mailtoLink
+  }
+
+  const downloadScreenshotsAsZip = async () => {
+    if (screenshots.length === 0) return
+
+    const zip = new JSZip()
+
+    // Add each screenshot to the zip
+    for (let i = 0; i < screenshots.length; i++) {
+      const screenshot = screenshots[i]
+      const base64Data = screenshot.dataUrl.replace(/^data:image\/png;base64,/, "")
+      zip.file(`screenshot-${i + 1}-${screenshot.token.substring(0, 8)}.png`, base64Data, {
+        base64: true,
+      })
+    }
+
+    // Generate the zip file
+    const blob = await zip.generateAsync({ type: "blob" })
+
+    // Create download link
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `screenshots-${new Date().toISOString().split("T")[0]}.zip`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   }
 
   const copyToClipboard = async () => {
@@ -244,9 +269,20 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
           {/* Screenshots */}
           {screenshots.length > 0 && (
             <div className="pt-4 border-t border-border">
-              <Label className="text-sm text-muted-foreground mb-3 block">
-                Screenshots ({screenshots.length} of {violations.length})
-              </Label>
+              <div className="flex items-center justify-between mb-3">
+                <Label className="text-sm text-muted-foreground">
+                  Screenshots ({screenshots.length} of {violations.length})
+                </Label>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={downloadScreenshotsAsZip}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download All
+                </Button>
+              </div>
               <div className="grid grid-cols-2 gap-3 max-h-[300px] overflow-y-auto">
                 {screenshots.map((screenshot) => (
                   <div
@@ -270,11 +306,24 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             <div className="text-sm text-muted-foreground">Loading screenshots...</div>
           )}
 
-          {!loadingScreenshots && screenshots.length === 0 && violations.length > 0 && (
+          {!loadingScreenshots && screenshots.length < violations.length && violations.length > 0 && (
             <div className="pt-4 border-t border-border">
-              <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <Image className="h-4 w-4 text-yellow-600 shrink-0" />
-                <p className="text-xs text-yellow-800">Some products don't have screenshots available</p>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <div className="flex items-start gap-3 mb-2">
+                  <Image className="h-4 w-4 text-yellow-600 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-xs text-yellow-800 font-medium">Products without screenshots:</p>
+                    <div className="mt-2 space-y-1">
+                      {violations
+                        .filter((v) => !screenshots.find((s) => s.token === v.immersive_product_page_token))
+                        .map((v) => (
+                          <p key={`missing-${v.id}`} className="text-xs text-yellow-700">
+                            • {v.name || v.umap_cleaned_name}
+                          </p>
+                        ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
