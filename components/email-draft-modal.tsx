@@ -358,22 +358,29 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
         {/* Expanded Screenshot Modal */}
         {expandedScreenshot && (
           <div
-            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-8"
             onClick={() => setExpandedScreenshot(null)}
           >
-            <div className="relative max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="relative max-w-5xl w-full max-h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setExpandedScreenshot(null)}
-                className="absolute -top-10 right-0 text-white hover:text-gray-300"
+                className="absolute -top-12 right-0 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all"
+                aria-label="Close"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               </button>
-              <img
-                src={expandedScreenshot.dataUrl}
-                alt="Expanded screenshot"
-                className="w-full h-auto rounded-lg"
-              />
-              <p className="text-sm text-gray-300 mt-3 text-center truncate">{expandedScreenshot.token}</p>
+              <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
+                <img
+                  src={expandedScreenshot.dataUrl}
+                  alt="Expanded screenshot"
+                  className="w-full h-auto"
+                />
+              </div>
+              <div className="mt-4 px-4 py-2 bg-black/50 rounded-lg backdrop-blur-sm">
+                <p className="text-sm text-white/90 text-center font-mono truncate">
+                  {expandedScreenshot.token}
+                </p>
+              </div>
             </div>
           </div>
         )}
