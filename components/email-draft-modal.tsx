@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Copy, Download, CheckCircle, Mail, Send, X, Image, Loader2 } from "lucide-react"
+import { Copy, Download, CheckCircle, Mail, Send, X, Image, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import type { Violation } from "@/types/violation"
 import JSZip from "jszip"
 
@@ -129,6 +129,32 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
 
     loadScreenshots()
   }, [open, violations])
+
+  // Handle keyboard navigation for expanded images
+  useEffect(() => {
+    if (!expandedScreenshot) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault()
+        const currentIndex = screenshots.findIndex((s) => s.token === expandedScreenshot.token)
+        if (currentIndex === -1) return
+
+        if (e.key === "ArrowLeft") {
+          const prevIndex = currentIndex > 0 ? currentIndex - 1 : screenshots.length - 1
+          setExpandedScreenshot(screenshots[prevIndex])
+        } else {
+          const nextIndex = currentIndex < screenshots.length - 1 ? currentIndex + 1 : 0
+          setExpandedScreenshot(screenshots[nextIndex])
+        }
+      } else if (e.key === "Escape") {
+        setExpandedScreenshot(null)
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [expandedScreenshot, screenshots])
 
   // Since we only allow one site at a time, we can generate a single draft
   const draft = useMemo(() => {
@@ -365,6 +391,7 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
             onClick={() => setExpandedScreenshot(null)}
           >
             <div className="relative max-w-5xl w-full max-h-full flex flex-col" onClick={(e) => e.stopPropagation()}>
+              {/* Close button */}
               <button
                 onClick={() => setExpandedScreenshot(null)}
                 className="absolute -top-12 right-0 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all"
@@ -372,6 +399,35 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
               >
                 <X className="h-5 w-5" />
               </button>
+
+              {/* Navigation arrows */}
+              {screenshots.length > 1 && (
+                <>
+                  <button
+                    onClick={() => {
+                      const currentIndex = screenshots.findIndex((s) => s.token === expandedScreenshot.token)
+                      const prevIndex = currentIndex > 0 ? currentIndex - 1 : screenshots.length - 1
+                      setExpandedScreenshot(screenshots[prevIndex])
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const currentIndex = screenshots.findIndex((s) => s.token === expandedScreenshot.token)
+                      const nextIndex = currentIndex < screenshots.length - 1 ? currentIndex + 1 : 0
+                      setExpandedScreenshot(screenshots[nextIndex])
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-white/90 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+
               <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
                 <img
                   src={expandedScreenshot.dataUrl}
@@ -379,10 +435,15 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
                   className="w-full h-auto"
                 />
               </div>
-              <div className="mt-4 px-4 py-2 bg-black/50 rounded-lg backdrop-blur-sm">
-                <p className="text-sm text-white/90 text-center font-mono truncate">
+              <div className="mt-4 px-4 py-2 bg-black/50 rounded-lg backdrop-blur-sm flex items-center justify-between">
+                <p className="text-sm text-white/90 font-mono truncate flex-1">
                   {expandedScreenshot.token}
                 </p>
+                {screenshots.length > 1 && (
+                  <p className="text-sm text-white/70 ml-4">
+                    {screenshots.findIndex((s) => s.token === expandedScreenshot.token) + 1} / {screenshots.length}
+                  </p>
+                )}
               </div>
             </div>
           </div>
