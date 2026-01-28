@@ -15,7 +15,6 @@ import { useFilteredViolations } from "./hooks/use-filtered-violations"
 import { useComplianceMetrics } from "./hooks/use-compliance-metrics"
 import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw } from "lucide-react"
 import { TableLoadingSkeleton } from "./table-loading-skeleton"
-import { EnforcementSummaryLoadingSkeleton } from "./enforcement-summary-skeleton"
 import type { Violation } from "@/types/violation"
 
 interface FiltersState {
@@ -168,23 +167,30 @@ export function ViolationsDashboard() {
 
       {/* Enforcement Summary & Seller Donut */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {isLoading ? (
-          <EnforcementSummaryLoadingSkeleton />
-        ) : (
-          <EnforcementSummary data={enforcementTableData} onSiteClick={handleSiteClick} />
-        )}
+        <EnforcementSummary data={enforcementTableData} onSiteClick={handleSiteClick} isLoading={isLoading} />
         <ComplianceChart
           violatingCount={complianceMetrics.sellersBreakinngUMAP}
           compliantCount={complianceMetrics.sellersInCompliance}
         />
       </div>
 
-      {/* Filters */}
-      <ViolationsFilters
-        filters={filters}
-        onFiltersChange={setFilters}
-        violations={violations}
-      />
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center gap-3 py-16 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span className="text-sm">Loading violations...</span>
+        </div>
+      )}
+
+      {/* Content - Hidden while loading */}
+      {!isLoading && (
+        <>
+          {/* Filters */}
+          <ViolationsFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            violations={violations}
+          />
 
       {/* Alerts Section */}
       {(error || siteError) && (
@@ -258,24 +264,22 @@ export function ViolationsDashboard() {
         </div>
       )}
 
-      {/* Table */}
-      {isLoading && (
-        <TableLoadingSkeleton />
-      )}
+          {/* Table */}
+          {violations.length === 0 && !error && (
+            <div className="flex items-center justify-center py-12 text-muted-foreground">
+              <p>No violations found. Check back later for new data.</p>
+            </div>
+          )}
 
-      {!isLoading && violations.length === 0 && !error && (
-        <div className="flex items-center justify-center py-12 text-muted-foreground">
-          <p>No violations found. Check back later for new data.</p>
-        </div>
-      )}
-
-      {!isLoading && violations.length > 0 && (
-        <ViolationsTable
-          violations={filteredViolations}
-          selectedIds={selectedIds}
-          onSelectionChange={handleSelectionChange}
-          lockedSite={currentSite}
-        />
+          {violations.length > 0 && (
+            <ViolationsTable
+              violations={filteredViolations}
+              selectedIds={selectedIds}
+              onSelectionChange={handleSelectionChange}
+              lockedSite={currentSite}
+            />
+          )}
+        </>
       )}
 
       {/* Email Draft Modal */}

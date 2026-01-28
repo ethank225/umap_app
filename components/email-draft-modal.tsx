@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Copy, Download, CheckCircle, Mail, Send, X, Image } from "lucide-react"
+import { Copy, Download, CheckCircle, Mail, Send, X, Image, Loader2 } from "lucide-react"
 import type { Violation } from "@/types/violation"
 import JSZip from "jszip"
 
@@ -303,7 +303,10 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
           )}
 
           {loadingScreenshots && (
-            <div className="text-sm text-muted-foreground">Loading screenshots...</div>
+            <div className="flex items-center justify-center gap-3 py-8 text-muted-foreground">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span className="text-sm">Loading screenshots...</span>
+            </div>
           )}
 
           {!loadingScreenshots && screenshots.length < violations.length && violations.length > 0 && (

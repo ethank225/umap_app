@@ -2,7 +2,7 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { useState } from "react"
 
 interface EnforcementItem {
@@ -16,9 +16,10 @@ interface EnforcementItem {
 interface EnforcementSummaryProps {
   data: EnforcementItem[]
   onSiteClick?: (site: string) => void
+  isLoading?: boolean
 }
 
-export function EnforcementSummary({ data, onSiteClick }: EnforcementSummaryProps) {
+export function EnforcementSummary({ data, onSiteClick, isLoading }: EnforcementSummaryProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
@@ -33,7 +34,12 @@ export function EnforcementSummary({ data, onSiteClick }: EnforcementSummaryProp
       <div className="p-6 pb-0">
         <h2 className="text-lg font-semibold text-foreground mb-4">Enforcement Summary</h2>
       </div>
-      {data.length > 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center flex-1 gap-3 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span className="text-sm">Loading enforcement data...</span>
+        </div>
+      ) : data.length > 0 ? (
         <>
           <div className="px-6 h-[420px]">
             <Table>
