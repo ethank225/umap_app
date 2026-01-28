@@ -16,6 +16,7 @@ import { useComplianceMetrics } from "./hooks/use-compliance-metrics"
 import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw } from "lucide-react"
 import { TableLoadingSkeleton } from "./table-loading-skeleton"
 import { EnforcementSummaryLoadingSkeleton } from "./enforcement-summary-skeleton"
+import type { Violation } from "@/types/violation"
 
 interface FiltersState {
   search: string
