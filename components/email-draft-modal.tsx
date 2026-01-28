@@ -34,7 +34,7 @@ interface ExpandedScreenshot {
 
 async function fetchScreenshot(token: string): Promise<string | null> {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pmtnbpuivcvebqlnevwm.supabase.co"
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const screenshotUrl = `${supabaseUrl}/storage/v1/object/public/images/screenshots/${token}.png`
 
     const response = await fetch(screenshotUrl)

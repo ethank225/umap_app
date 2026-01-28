@@ -38,18 +38,18 @@ export function ViolationsTable({
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 15
 
-  // Reset to first page when violations data changes
+  // Reset to first page when violations data changes or site is locked
   useEffect(() => {
     setCurrentPage(1)
-  }, [violations.length])
+  }, [violations.length, lockedSite])
 
-  // Filter violations to only those from the locked site (or all if no site locked)
-  const selectableViolations = lockedSite
+  // Filter violations by locked site
+  const filteredByLock = lockedSite
     ? violations.filter((v) => v.site === lockedSite)
     : violations
 
   // Sort violations
-  const sortedViolations = [...selectableViolations].sort((a, b) => {
+  const sortedViolations = [...filteredByLock].sort((a, b) => {
     if (!sortField) return 0
 
     // Special handling for dates so we fallback to created_at when date is missing
@@ -250,9 +250,6 @@ export function ViolationsTable({
           </TableHeader>
           <TableBody>
           {paginatedViolations.map((violation) => {
-            const isFromDifferentSite = lockedSite && violation.site !== lockedSite
-            const isDisabled = Boolean(isFromDifferentSite && !selectedIds.has(String(violation.id)))
-
             const handleRowClick = (e: React.MouseEvent) => {
               // Check if clicking on checkbox or its cell
               const target = e.target as HTMLElement
@@ -272,16 +269,15 @@ export function ViolationsTable({
                 className={cn(
                   "border-border",
                   selectedIds.has(String(violation.id)) && "bg-primary/5",
-                  isDisabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:bg-muted/50"
+                  "cursor-pointer hover:bg-muted/50"
                 )}
                 onClick={handleRowClick}
               >
                 <TableCell onClick={(e) => e.stopPropagation()} data-checkbox-cell className="px-2 w-8 h-10">
                   <Checkbox
                     checked={selectedIds.has(String(violation.id))}
-                    onCheckedChange={() => !isDisabled && toggleOne(String(violation.id))}
+                    onCheckedChange={() => toggleOne(String(violation.id))}
                     aria-label={`Select ${violation.name || violation.umap_cleaned_name}`}
-                    disabled={isDisabled}
                     className="w-4 h-4"
                   />
                 </TableCell>
