@@ -35,15 +35,18 @@ export function ViolationsDashboard() {
 
   const { violations, isLoading, error } = useViolationsData()
 
-  // Deduplicate violations by name to match table behavior
+  // Deduplicate violations per-site by unique listing (site + name)
   const deduplicatedViolations = useMemo(() => {
-    return violations.reduce((acc, violation) => {
+    const seen = new Set<string>()
+    return violations.filter((violation) => {
       const violationName = violation.name || violation.umap_cleaned_name
-      if (!acc.find((v) => (v.name || v.umap_cleaned_name) === violationName)) {
-        acc.push(violation)
+      const key = `${violation.site}||${violationName}`
+      if (seen.has(key)) {
+        return false
       }
-      return acc
-    }, [] as Violation[])
+      seen.add(key)
+      return true
+    })
   }, [violations])
 
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false)
@@ -121,27 +124,6 @@ export function ViolationsDashboard() {
     handleClearSelection()
     setFilters(prev => ({ ...prev, site }))
   }
-
-  // Count violations by site (unique listings per site)
-  const siteBreakdown = useMemo(() => {
-    const counts: Record<string, Set<string>> = {}
-    for (const v of deduplicatedViolations) {
-      if (!counts[v.site]) {
-        counts[v.site] = new Set()
-      }
-      // Create unique listing identifier
-      const listingId = `${v.site}||${v.name || v.umap_cleaned_name}||${v.product_link}`
-      counts[v.site].add(listingId)
-    }
-
-    // Convert sets to counts
-    return Object.entries(counts).reduce((acc, [site, set]) => {
-      acc[site] = set.size
-      return acc
-    }, {} as Record<string, number>)
-  }, [deduplicatedViolations])
-
-  // Calculate compliance metrics
 
 
   return (

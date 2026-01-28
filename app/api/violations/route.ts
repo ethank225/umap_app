@@ -16,6 +16,8 @@ export async function GET() {
         .select('*')
         .range(page * pageSize, (page + 1) * pageSize - 1)
 
+      console.log(`Page ${page}: got ${data?.length ?? 0} rows`)
+
       if (error) {
         console.error('Supabase error:', error)
         return NextResponse.json(
