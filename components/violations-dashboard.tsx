@@ -154,21 +154,6 @@ export function ViolationsDashboard() {
             Review pricing violations and select items for vendor outreach
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          {selectedIds.size > 0 && (
-            <span className="text-sm text-muted-foreground">
-              {selectedIds.size} selected
-            </span>
-          )}
-          <Button
-            onClick={handleDraftEmail}
-            disabled={selectedIds.size === 0}
-            className="gap-2"
-          >
-            <Mail className="h-4 w-4" />
-            Draft Email
-          </Button>
-        </div>
       </div>
 
       {/* Stats Summary */}
@@ -219,11 +204,21 @@ export function ViolationsDashboard() {
         violations={violations}
       />
 
-      {/* Error Alert */}
-      {error && (
-        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
-          <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
-          <p className="text-sm text-destructive flex-1">{error}</p>
+      {/* Alerts Section */}
+      {(error || siteError) && (
+        <div className="space-y-3">
+          {error && (
+            <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+              <AlertTriangle className="h-5 w-5 text-destructive shrink-0" />
+              <p className="text-sm text-destructive flex-1">{error}</p>
+            </div>
+          )}
+          {siteError && (
+            <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
+              <XCircle className="h-5 w-5 text-destructive shrink-0" />
+              <p className="text-sm text-destructive flex-1">{siteError}</p>
+            </div>
+          )}
         </div>
       )}
 
@@ -235,39 +230,51 @@ export function ViolationsDashboard() {
         </div>
       )}
 
-      {/* Site Error Alert */}
-      {siteError && (
-        <div className="flex items-center gap-3 bg-destructive/10 border border-destructive/30 rounded-lg p-4">
-          <XCircle className="h-5 w-5 text-destructive shrink-0" />
-          <p className="text-sm text-destructive flex-1">{siteError}</p>
+      {/* Table Controls - Selection Info & Actions */}
+      {!isLoading && violations.length > 0 && (
+        <div className="flex items-start justify-between gap-4 border-t pt-6">
+          <div className="flex flex-col gap-3">
+            {/* Draft Email Button */}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={handleDraftEmail}
+                disabled={selectedIds.size === 0}
+                className="gap-2"
+              >
+                <Mail className="h-4 w-4" />
+                Draft Email
+              </Button>
+              {selectedIds.size > 0 && (
+                <span className="text-sm text-muted-foreground">
+                  {selectedIds.size} selected
+                </span>
+              )}
+            </div>
+
+            {/* Current site indicator */}
+            {currentSite && selectedIds.size > 0 && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Selecting from:</span>
+                <span className="font-medium text-primary">{currentSite}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearSelection}
+                  className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Data update status */}
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <RefreshCw className="h-3 w-3" />
+            <span>Updated daily</span>
+          </div>
         </div>
       )}
-
-      {/* Results count and current site indicator */}
-      <div className="flex items-center justify-between min-h-[28px]">
-        <div>
-          {currentSite && selectedIds.size > 0 && (
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Selecting from:</span>
-              <span className="font-medium text-primary">{currentSite}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearSelection}
-                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-              >
-                Clear
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* Data update status */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground ml-auto">
-          <RefreshCw className="h-3 w-3" />
-          <span>Updated daily</span>
-        </div>
-      </div>
 
       {/* Table */}
       {isLoading && (
