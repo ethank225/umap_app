@@ -228,14 +228,16 @@ export function ViolationsTable({
                   }}
                 />
               </TableHead>
-              <TableHead className="text-muted-foreground text-xs min-w-[120px] max-w-[200px]">
+              <TableHead className="text-muted-foreground text-xs w-[150px] max-w-[150px]">
                 <SortIcon field="name" label="Product" />
               </TableHead>
               <TableHead className="text-muted-foreground text-xs w-[100px]">
                 <SortIcon field="site" label="Site" />
               </TableHead>
-              <TableHead className="text-center text-muted-foreground text-xs w-[80px]">
-                <SortIcon field="confidence_score" label="Confidence" />
+              <TableHead className="text-muted-foreground text-xs w-[80px]">
+                <div className="flex justify-center">
+                  <SortIcon field="confidence_score" label="Confidence" />
+                </div>
               </TableHead>
               <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
                 <SortIcon field="umap_price" label="UMAP" />
@@ -284,11 +286,12 @@ export function ViolationsTable({
                     className="w-4 h-4"
                   />
                 </TableCell>
-                <TableCell className="font-medium text-xs truncate max-w-[200px]" title={violation.name || violation.umap_cleaned_name}>
+                <TableCell className="font-medium text-xs truncate max-w-[150px]" title={violation.name || violation.umap_cleaned_name}>
                   {violation.name || violation.umap_cleaned_name}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
-                <TableCell className="text-xs text-center">
+                <TableCell className="text-xs">
+                  <div className="flex justify-center">
                   <Badge className={
                     (violation.confidence_score ?? 0) >= 70
                       ? "bg-green-100 text-green-800 hover:bg-green-100"
@@ -298,6 +301,7 @@ export function ViolationsTable({
                   }>
                     {Math.round(violation.confidence_score ?? 0)}%
                   </Badge>
+                  </div>
                 </TableCell>
                 <TableCell className="text-left tabular-nums text-xs px-2">
                   ${violation.umap_price.toFixed(2)}
