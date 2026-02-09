@@ -1,6 +1,7 @@
 "use client"
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { useState } from "react"
@@ -11,6 +12,7 @@ interface EnforcementItem {
   avgPercentDiff: number
   maxPercentDiff: number
   products: number
+  avgConfidenceScore: number
 }
 
 interface EnforcementSummaryProps {
@@ -45,10 +47,11 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Site</TableHead>
-                  <TableHead className="text-right">Violations</TableHead>
-                  <TableHead className="text-right">Avg % Diff</TableHead>
-                  <TableHead className="text-right">Max % Diff</TableHead>
+                  <TableHead className="text-xs">Site</TableHead>
+                  <TableHead className="text-xs w-[80px]">Confidence</TableHead>
+                  <TableHead className="text-xs text-right w-[70px]">Violations</TableHead>
+                  <TableHead className="text-xs text-right w-[80px]">Avg % Diff</TableHead>
+                  <TableHead className="text-xs text-right w-[80px]">Max % Diff</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -58,12 +61,23 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                     className={onSiteClick ? "cursor-pointer hover:bg-muted/50" : ""}
                     onClick={() => onSiteClick?.(item.site)}
                   >
-                    <TableCell className="font-medium">{item.site}</TableCell>
-                    <TableCell className="text-right text-destructive font-semibold">
+                    <TableCell className="font-medium text-xs py-2">{item.site}</TableCell>
+                    <TableCell className="py-2">
+                      <Badge className={`text-[10px] px-1.5 py-0 ${
+                        item.avgConfidenceScore >= 70
+                          ? "bg-green-100 text-green-800 hover:bg-green-100"
+                          : item.avgConfidenceScore >= 30
+                          ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                          : "bg-red-100 text-red-800 hover:bg-red-100"
+                      }`}>
+                        {Math.round(item.avgConfidenceScore)}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right text-xs text-destructive font-semibold py-2">
                       {item.violations}
                     </TableCell>
-                    <TableCell className="text-right">{item.avgPercentDiff.toFixed(2)}%</TableCell>
-                    <TableCell className="text-right">{item.maxPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-right text-xs py-2">{item.avgPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-right text-xs py-2">{item.maxPercentDiff.toFixed(2)}%</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

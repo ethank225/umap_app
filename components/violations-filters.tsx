@@ -20,6 +20,7 @@ interface FiltersState {
   site: string
   gender: string
   violationsOnly: boolean
+  confidence: string
 }
 
 interface ViolationsFiltersProps {
@@ -48,6 +49,7 @@ export function ViolationsFilters({ filters, onFiltersChange, violations }: Viol
       site: "all",
       gender: "all",
       violationsOnly: true,
+      confidence: "all",
     })
   }
 
@@ -55,7 +57,8 @@ export function ViolationsFilters({ filters, onFiltersChange, violations }: Viol
     filters.search !== "" ||
     filters.site !== "all" ||
     filters.gender !== "all" ||
-    !filters.violationsOnly
+    !filters.violationsOnly ||
+    filters.confidence !== "all"
 
   return (
     <div className="bg-card border border-border rounded-lg p-4">
@@ -109,6 +112,22 @@ export function ViolationsFilters({ filters, onFiltersChange, violations }: Viol
                   {gender}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Confidence Filter */}
+        <div className="w-[160px] min-w-[160px] shrink-0">
+          <Label className="text-xs text-muted-foreground mb-1.5 block">Confidence</Label>
+          <Select value={filters.confidence} onValueChange={(v) => updateFilter("confidence", v)}>
+            <SelectTrigger className="bg-secondary border-border w-full">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="high">High (70+)</SelectItem>
+              <SelectItem value="medium">Medium (30-69)</SelectItem>
+              <SelectItem value="low">Low (&lt;30)</SelectItem>
             </SelectContent>
           </Select>
         </div>

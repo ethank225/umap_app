@@ -14,4 +14,5 @@ export interface Violation {
   date: string
   gender: string
   violation: boolean
+  confidence_score: number
 }

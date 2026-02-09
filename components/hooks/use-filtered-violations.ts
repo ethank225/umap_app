@@ -6,6 +6,7 @@ interface FiltersState {
   site: string
   gender: string
   violationsOnly: boolean
+  confidence: string
 }
 
 interface UseFilteredViolationsReturn {
@@ -17,6 +18,7 @@ interface UseFilteredViolationsReturn {
     avgPercentDiff: number
     maxPercentDiff: number
     products: number
+    avgConfidenceScore: number
   }>
 }
 
@@ -39,6 +41,12 @@ export function useFilteredViolations(
       if (filters.violationsOnly && !v.violation) {
         return false
       }
+      if (filters.confidence !== "all") {
+        const score = v.confidence_score ?? 0
+        if (filters.confidence === "high" && score < 70) return false
+        if (filters.confidence === "medium" && (score < 30 || score >= 70)) return false
+        if (filters.confidence === "low" && score >= 30) return false
+      }
       return true
     })
   }, [filters, violations])
@@ -57,6 +65,7 @@ export function useFilteredViolations(
       sumPercentDiff: number
       maxPercentDiff: number
       uniqueProducts: Set<string>
+      sumConfidenceScore: number
     }> = {}
 
     for (const v of violations) {
@@ -68,6 +77,7 @@ export function useFilteredViolations(
           sumPercentDiff: 0,
           maxPercentDiff: v.per_diff || 0,
           uniqueProducts: new Set<string>(),
+          sumConfidenceScore: 0,
         }
       }
 
@@ -75,6 +85,7 @@ export function useFilteredViolations(
       siteStats[v.site].sumPercentDiff += v.per_diff || 0
       siteStats[v.site].maxPercentDiff = Math.max(siteStats[v.site].maxPercentDiff, v.per_diff || 0)
       siteStats[v.site].uniqueProducts.add(v.name || v.umap_cleaned_name)
+      siteStats[v.site].sumConfidenceScore += v.confidence_score || 0
     }
 
     return Object.entries(siteStats)
@@ -84,12 +95,21 @@ export function useFilteredViolations(
         avgPercentDiff: stats.rows > 0 ? stats.sumPercentDiff / stats.rows : 0,
         maxPercentDiff: stats.maxPercentDiff,
         products: stats.uniqueProducts.size,
+        avgConfidenceScore: stats.rows > 0 ? stats.sumConfidenceScore / stats.rows : 0,
       }))
+      .filter((item) => {
+        if (filters.confidence === "all") return true
+        const score = item.avgConfidenceScore
+        if (filters.confidence === "high") return score >= 70
+        if (filters.confidence === "medium") return score >= 30 && score < 70
+        if (filters.confidence === "low") return score < 30
+        return true
+      })
       .sort((a, b) => {
         if (b.violations !== a.violations) return b.violations - a.violations
         return a.avgPercentDiff - b.avgPercentDiff
       })
-  }, [violations])
+  }, [violations, filters.confidence])
 
   return {
     filteredViolations,
