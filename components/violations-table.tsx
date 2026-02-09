@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-type SortField = "name" | "site" | "umap_price" | "list_price" | "per_diff" | "date" | null
+type SortField = "name" | "site" | "umap_price" | "list_price" | "per_diff" | "confidence_score" | "date" | null
 type SortDirection = "asc" | "desc"
 
 interface ViolationsTableProps {
@@ -234,6 +234,9 @@ export function ViolationsTable({
               <TableHead className="text-muted-foreground text-xs w-[100px]">
                 <SortIcon field="site" label="Site" />
               </TableHead>
+              <TableHead className="text-muted-foreground text-xs w-[80px]">
+                <SortIcon field="confidence_score" label="Confidence" />
+              </TableHead>
               <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
                 <SortIcon field="umap_price" label="UMAP" />
               </TableHead>
@@ -285,6 +288,17 @@ export function ViolationsTable({
                   {violation.name || violation.umap_cleaned_name}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
+                <TableCell className="text-xs">
+                  <Badge className={
+                    (violation.confidence_score ?? 0) >= 70
+                      ? "bg-green-100 text-green-800 hover:bg-green-100"
+                      : (violation.confidence_score ?? 0) >= 30
+                      ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                      : "bg-red-100 text-red-800 hover:bg-red-100"
+                  }>
+                    {Math.round(violation.confidence_score ?? 0)}%
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-left tabular-nums text-xs px-2">
                   ${violation.umap_price.toFixed(2)}
                 </TableCell>

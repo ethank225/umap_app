@@ -22,6 +22,7 @@ interface FiltersState {
   site: string
   gender: string
   violationsOnly: boolean
+  confidence: string
 }
 
 export function ViolationsDashboard() {
@@ -55,6 +56,7 @@ export function ViolationsDashboard() {
     site: "all",
     gender: "all",
     violationsOnly: true,
+    confidence: "all",
   })
 
   const { filteredViolations, enforcementTableData } = useFilteredViolations(deduplicatedViolations, filters)
