@@ -234,7 +234,7 @@ export function ViolationsTable({
               <TableHead className="text-muted-foreground text-xs w-[100px]">
                 <SortIcon field="site" label="Site" />
               </TableHead>
-              <TableHead className="text-muted-foreground text-xs w-[80px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[80px]">
                 <SortIcon field="confidence_score" label="Confidence" />
               </TableHead>
               <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
@@ -288,7 +288,7 @@ export function ViolationsTable({
                   {violation.name || violation.umap_cleaned_name}
                 </TableCell>
                 <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
-                <TableCell className="text-xs">
+                <TableCell className="text-xs text-center">
                   <Badge className={
                     (violation.confidence_score ?? 0) >= 70
                       ? "bg-green-100 text-green-800 hover:bg-green-100"

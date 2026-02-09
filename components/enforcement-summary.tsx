@@ -48,7 +48,7 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-xs">Site</TableHead>
-                  <TableHead className="text-xs w-[80px]">Confidence</TableHead>
+                  <TableHead className="text-xs text-center w-[80px]">Confidence</TableHead>
                   <TableHead className="text-xs text-right w-[70px]">Violations</TableHead>
                   <TableHead className="text-xs text-right w-[80px]">Avg % Diff</TableHead>
                   <TableHead className="text-xs text-right w-[80px]">Max % Diff</TableHead>
@@ -62,7 +62,7 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                     onClick={() => onSiteClick?.(item.site)}
                   >
                     <TableCell className="font-medium text-xs py-2">{item.site}</TableCell>
-                    <TableCell className="py-2">
+                    <TableCell className="py-2 text-center">
                       <Badge className={`text-[10px] px-1.5 py-0 ${
                         item.avgConfidenceScore >= 70
                           ? "bg-green-100 text-green-800 hover:bg-green-100"
