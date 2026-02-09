@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 
 interface EnforcementItem {
   site: string
@@ -21,15 +21,51 @@ interface EnforcementSummaryProps {
   isLoading?: boolean
 }
 
+type SortField = "site" | "avgConfidenceScore" | "violations" | "avgPercentDiff" | "maxPercentDiff" | null
+type SortDirection = "asc" | "desc"
+
 export function EnforcementSummary({ data, onSiteClick, isLoading }: EnforcementSummaryProps) {
   const [currentPage, setCurrentPage] = useState(1)
+  const [sortField, setSortField] = useState<SortField>(null)
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const itemsPerPage = 10
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
+    setCurrentPage(1)
+  }
+
+  const SortIcon = ({ field, label }: { field: SortField; label: string }) => (
+    <button
+      onClick={(e) => { e.stopPropagation(); handleSort(field) }}
+      className={`w-full text-inherit hover:text-foreground transition-colors ${sortField === field ? "text-foreground" : ""}`}
+    >
+      {label}{sortField === field && (sortDirection === "asc" ? " ▲" : " ▼")}
+    </button>
+  )
+
+  const sortedData = useMemo(() => {
+    if (!sortField) return data
+    return [...data].sort((a, b) => {
+      let aVal: any = a[sortField]
+      let bVal: any = b[sortField]
+      if (typeof aVal === "string") {
+        return sortDirection === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal)
+      }
+      return sortDirection === "asc" ? aVal - bVal : bVal - aVal
+    })
+  }, [data, sortField, sortDirection])
+
   // Pagination calculations
-  const totalPages = Math.ceil(data.length / itemsPerPage)
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const paginatedData = data.slice(startIndex, endIndex)
+  const paginatedData = sortedData.slice(startIndex, endIndex)
 
   return (
     <div className="lg:col-span-2 bg-card border border-border rounded-lg overflow-hidden flex flex-col h-full min-h-[420px]">
@@ -47,11 +83,11 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">Site</TableHead>
-                  <TableHead className="text-xs text-center w-[80px]">Confidence</TableHead>
-                  <TableHead className="text-xs text-right w-[70px]">Violations</TableHead>
-                  <TableHead className="text-xs text-right w-[80px]">Avg % Diff</TableHead>
-                  <TableHead className="text-xs text-right w-[80px]">Max % Diff</TableHead>
+                  <TableHead className="text-center text-xs"><SortIcon field="site" label="Site" /></TableHead>
+                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="avgConfidenceScore" label="Confidence" /></TableHead>
+                  <TableHead className="text-center text-xs w-[70px]"><SortIcon field="violations" label="Violations" /></TableHead>
+                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="avgPercentDiff" label="Avg % Diff" /></TableHead>
+                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="maxPercentDiff" label="Max % Diff" /></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -61,9 +97,9 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                     className={onSiteClick ? "cursor-pointer hover:bg-muted/50" : ""}
                     onClick={() => onSiteClick?.(item.site)}
                   >
-                    <TableCell className="font-medium text-xs py-2">{item.site}</TableCell>
+                    <TableCell className="font-medium text-xs text-center py-2">{item.site}</TableCell>
                     <TableCell className="py-2 text-center">
-                      <Badge className={`text-[10px] px-1.5 py-0 ${
+                      <Badge className={`flex mx-auto text-[10px] px-1.5 py-0 ${
                         item.avgConfidenceScore >= 70
                           ? "bg-green-100 text-green-800 hover:bg-green-100"
                           : item.avgConfidenceScore >= 30
@@ -73,11 +109,11 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                         {Math.round(item.avgConfidenceScore)}%
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right text-xs text-destructive font-semibold py-2">
+                    <TableCell className="text-center text-xs text-destructive font-semibold py-2">
                       {item.violations}
                     </TableCell>
-                    <TableCell className="text-right text-xs py-2">{item.avgPercentDiff.toFixed(2)}%</TableCell>
-                    <TableCell className="text-right text-xs py-2">{item.maxPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-center text-xs py-2">{item.avgPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-center text-xs py-2">{item.maxPercentDiff.toFixed(2)}%</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

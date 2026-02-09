@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
-import { ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Download } from "lucide-react"
+import { ChevronLeft, ChevronRight, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Violation } from "@/types/violation"
 
@@ -124,18 +124,12 @@ export function ViolationsTable({
   }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center gap-1 hover:text-foreground transition-colors"
-    >
-      {label}
-      {sortField === field ? (
-        sortDirection === "asc" ? (
-          <ArrowUp className="h-4 w-4" />
-        ) : (
-          <ArrowDown className="h-4 w-4" />
-        )
-      ) : (
-        <div className="h-4 w-4" />
+      className={cn(
+        "hover:text-foreground transition-colors w-full text-inherit",
+        sortField === field && "text-foreground"
       )}
+    >
+      {label}{sortField === field && (sortDirection === "asc" ? " ▲" : " ▼")}
     </button>
   )
 
@@ -228,39 +222,25 @@ export function ViolationsTable({
                   }}
                 />
               </TableHead>
-              <TableHead className="text-muted-foreground text-xs w-[200px] max-w-[200px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[200px] max-w-[200px]">
                 <SortIcon field="name" label="Product" />
               </TableHead>
-              <TableHead className="text-muted-foreground text-xs w-[100px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[100px]">
                 <SortIcon field="site" label="Site" />
               </TableHead>
-              <TableHead className="text-muted-foreground text-xs w-[100px]">
-                <button
-                  onClick={() => handleSort("confidence_score")}
-                  className="flex items-center gap-1 hover:text-foreground transition-colors mx-auto"
-                >
-                  Confidence
-                  {sortField === "confidence_score" ? (
-                    sortDirection === "asc" ? (
-                      <ArrowUp className="h-4 w-4" />
-                    ) : (
-                      <ArrowDown className="h-4 w-4" />
-                    )
-                  ) : (
-                    <div className="h-4 w-4" />
-                  )}
-                </button>
+              <TableHead className="text-center text-muted-foreground text-xs w-[100px]">
+                <SortIcon field="confidence_score" label="Confidence" />
               </TableHead>
-              <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[80px]">
                 <SortIcon field="umap_price" label="UMAP" />
               </TableHead>
-              <TableHead className="text-right text-muted-foreground text-xs w-[80px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[80px]">
                 <SortIcon field="list_price" label="Observed" />
               </TableHead>
-              <TableHead className="text-right text-muted-foreground text-xs w-[70px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[70px]">
                 <SortIcon field="per_diff" label="Diff %" />
               </TableHead>
-              <TableHead className="text-right text-muted-foreground text-xs w-[90px]">
+              <TableHead className="text-center text-muted-foreground text-xs w-[90px]">
                 <SortIcon field="date" label="Date" />
               </TableHead>
             </TableRow>
@@ -298,10 +278,10 @@ export function ViolationsTable({
                     className="w-4 h-4"
                   />
                 </TableCell>
-                <TableCell className="font-medium text-xs truncate max-w-[200px]" title={violation.name || violation.umap_cleaned_name}>
+                <TableCell className="font-medium text-xs text-center truncate max-w-[200px]" title={violation.name || violation.umap_cleaned_name}>
                   {violation.name || violation.umap_cleaned_name}
                 </TableCell>
-                <TableCell className="text-muted-foreground text-xs truncate">{violation.site}</TableCell>
+                <TableCell className="text-muted-foreground text-xs text-center truncate">{violation.site}</TableCell>
                 <TableCell className="text-xs text-center">
                   <Badge className={`flex mx-auto ${
                     (violation.confidence_score ?? 0) >= 70
@@ -313,11 +293,11 @@ export function ViolationsTable({
                     {Math.round(violation.confidence_score ?? 0)}%
                   </Badge>
                 </TableCell>
-                <TableCell className="text-left tabular-nums text-xs px-2">
+                <TableCell className="text-center tabular-nums text-xs px-2">
                   ${violation.umap_price.toFixed(2)}
                 </TableCell>
                 <TableCell className={cn(
-                  "text-left tabular-nums font-medium text-xs px-2",
+                  "text-center tabular-nums font-medium text-xs px-2",
                   (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
@@ -327,7 +307,7 @@ export function ViolationsTable({
                   ${violation.list_price.toFixed(2)}
                 </TableCell>
                 <TableCell className={cn(
-                  "text-left tabular-nums font-medium text-xs px-2",
+                  "text-center tabular-nums font-medium text-xs px-2",
                   (violation.per_diff >= 0)
                     ? "text-green-600"
                     : violation.per_diff < 0
@@ -336,7 +316,7 @@ export function ViolationsTable({
                 )}>
                   {violation.per_diff?.toFixed(2) || '0.0'}%
                 </TableCell>
-                <TableCell className="text-left text-muted-foreground text-xs px-2">
+                <TableCell className="text-center text-muted-foreground text-xs px-2">
                   {(() => {
                     const rawDate = violation.date || violation.created_at
                     if (!rawDate) return "--"

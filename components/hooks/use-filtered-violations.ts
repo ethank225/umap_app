@@ -97,19 +97,11 @@ export function useFilteredViolations(
         products: stats.uniqueProducts.size,
         avgConfidenceScore: stats.rows > 0 ? stats.sumConfidenceScore / stats.rows : 0,
       }))
-      .filter((item) => {
-        if (filters.confidence === "all") return true
-        const score = item.avgConfidenceScore
-        if (filters.confidence === "high") return score >= 70
-        if (filters.confidence === "medium") return score >= 30 && score < 70
-        if (filters.confidence === "low") return score < 30
-        return true
-      })
       .sort((a, b) => {
         if (b.violations !== a.violations) return b.violations - a.violations
         return a.avgPercentDiff - b.avgPercentDiff
       })
-  }, [violations, filters.confidence])
+  }, [violations])
 
   return {
     filteredViolations,
