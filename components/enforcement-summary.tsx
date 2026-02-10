@@ -83,11 +83,11 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-center text-xs"><SortIcon field="site" label="Site" /></TableHead>
-                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="avgConfidenceScore" label="Confidence" /></TableHead>
-                  <TableHead className="text-center text-xs w-[70px]"><SortIcon field="violations" label="Violations" /></TableHead>
-                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="avgPercentDiff" label="Avg % Diff" /></TableHead>
-                  <TableHead className="text-center text-xs w-[80px]"><SortIcon field="maxPercentDiff" label="Max % Diff" /></TableHead>
+                  <TableHead className="text-center text-sm w-[120px]"><SortIcon field="site" label="Site" /></TableHead>
+                  <TableHead className="text-center text-sm w-[80px]"><SortIcon field="avgConfidenceScore" label="Confidence" /></TableHead>
+                  <TableHead className="text-center text-sm w-[70px]"><SortIcon field="violations" label="Violations" /></TableHead>
+                  <TableHead className="text-center text-sm w-[80px]"><SortIcon field="avgPercentDiff" label="Avg % Diff" /></TableHead>
+                  <TableHead className="text-center text-sm w-[80px]"><SortIcon field="maxPercentDiff" label="Max % Diff" /></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -97,9 +97,9 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                     className={onSiteClick ? "cursor-pointer hover:bg-muted/50" : ""}
                     onClick={() => onSiteClick?.(item.site)}
                   >
-                    <TableCell className="font-medium text-xs text-center py-2">{item.site}</TableCell>
+                    <TableCell className="font-medium text-sm text-center py-2">{item.site}</TableCell>
                     <TableCell className="py-2 text-center">
-                      <Badge className={`flex mx-auto text-[10px] px-1.5 py-0 ${
+                      <Badge className={`flex mx-auto text-xs px-1.5 py-0 ${
                         item.avgConfidenceScore >= 70
                           ? "bg-green-100 text-green-800 hover:bg-green-100"
                           : item.avgConfidenceScore >= 30
@@ -109,11 +109,11 @@ export function EnforcementSummary({ data, onSiteClick, isLoading }: Enforcement
                         {Math.round(item.avgConfidenceScore)}%
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-center text-xs text-destructive font-semibold py-2">
+                    <TableCell className="text-center text-sm text-destructive font-semibold py-2">
                       {item.violations}
                     </TableCell>
-                    <TableCell className="text-center text-xs py-2">{item.avgPercentDiff.toFixed(2)}%</TableCell>
-                    <TableCell className="text-center text-xs py-2">{item.maxPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-center text-sm py-2">{item.avgPercentDiff.toFixed(2)}%</TableCell>
+                    <TableCell className="text-center text-sm py-2">{item.maxPercentDiff.toFixed(2)}%</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
