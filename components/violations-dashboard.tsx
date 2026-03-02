@@ -13,9 +13,41 @@ import { useViolations } from "@/lib/violations-context"
 import { useViolationsData } from "./hooks/use-violations-data"
 import { useFilteredViolations } from "./hooks/use-filtered-violations"
 import { useComplianceMetrics } from "./hooks/use-compliance-metrics"
-import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw } from "lucide-react"
+import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw, Clock } from "lucide-react"
 import { TableLoadingSkeleton } from "./table-loading-skeleton"
 import type { Violation } from "@/types/violation"
+
+// Mon & Wed at 1am PST = 9am UTC
+function getLastRefreshTime(): Date | null {
+  const now = new Date()
+  const refreshDays = [1, 3] // Monday=1, Wednesday=3
+  for (let daysBack = 0; daysBack <= 14; daysBack++) {
+    const candidate = new Date(now)
+    candidate.setUTCDate(candidate.getUTCDate() - daysBack)
+    candidate.setUTCHours(9, 0, 0, 0)
+    if (refreshDays.includes(candidate.getUTCDay()) && candidate <= now) {
+      return candidate
+    }
+  }
+  return null
+}
+
+function formatLastRefresh(date: Date | null): string {
+  if (!date) return "Unknown"
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  const timeStr = date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: "America/Los_Angeles",
+    timeZoneName: "short",
+  })
+  if (diffDays === 0) return `Today at ${timeStr}`
+  if (diffDays === 1) return `Yesterday at ${timeStr}`
+  const dayName = date.toLocaleDateString("en-US", { weekday: "long", timeZone: "America/Los_Angeles" })
+  return `${dayName} at ${timeStr}`
+}
 
 interface FiltersState {
   search: string
@@ -33,7 +65,7 @@ export function ViolationsDashboard() {
     setCurrentSite,
   } = useViolations()
 
-  const { violations, isLoading, error } = useViolationsData()
+  const { violations, isLoading, error, lastFetchedAt, refetch } = useViolationsData()
 
   // Deduplicate violations per-site by unique listing (site + name)
   const deduplicatedViolations = useMemo(() => {
@@ -130,14 +162,40 @@ export function ViolationsDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Violations</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Review pricing violations and select items for vendor outreach
           </p>
         </div>
+        <div className="flex flex-col items-end gap-1 text-xs rounded-lg border bg-muted/40 px-3 py-2 shrink-0">
+          <div className="flex items-center gap-1.5 font-medium text-foreground">
+            <RefreshCw className="h-3 w-3 text-muted-foreground" />
+            <span>Data loaded: {isLoading ? "Loading…" : formatLastRefresh(lastFetchedAt)}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            <span>Runs Mon &amp; Wed at 1am PST</span>
+          </div>
+        </div>
       </div>
+
+      {/* Stale data banner */}
+      {!isLoading && lastFetchedAt && getLastRefreshTime() && lastFetchedAt < getLastRefreshTime()! && (
+        <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 dark:bg-amber-950/20 dark:border-amber-800/40 rounded-lg px-4 py-3 text-sm">
+          <RefreshCw className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span className="text-amber-800 dark:text-amber-300 flex-1">
+            New data is available since 1am PST
+          </span>
+          <button
+            onClick={refetch}
+            className="font-medium text-amber-700 dark:text-amber-400 hover:underline"
+          >
+            Refresh now
+          </button>
+        </div>
+      )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -258,11 +316,6 @@ export function ViolationsDashboard() {
             )}
           </div>
 
-          {/* Data update status */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <RefreshCw className="h-3 w-3" />
-            <span>Updated daily</span>
-          </div>
         </div>
       )}
 
