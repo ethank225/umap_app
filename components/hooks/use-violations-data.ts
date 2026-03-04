@@ -9,10 +9,10 @@ interface UseViolationsReturn {
   refetch: () => void
 }
 
-// Mon & Wed at 1am PST = 9am UTC
+// Mon & Thurs at 1am PST = 9am UTC
 function getMostRecentRefreshTime(): Date | null {
   const now = new Date()
-  const refreshDays = [1, 3] // Monday=1, Wednesday=3
+  const refreshDays = [1, 4] // Monday=1, Thursday=4
   for (let daysBack = 0; daysBack <= 14; daysBack++) {
     const candidate = new Date(now)
     candidate.setUTCDate(candidate.getUTCDate() - daysBack)

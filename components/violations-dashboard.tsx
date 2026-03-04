@@ -17,10 +17,10 @@ import { Mail, AlertTriangle, XCircle, Loader2, RefreshCw, Clock } from "lucide-
 import { TableLoadingSkeleton } from "./table-loading-skeleton"
 import type { Violation } from "@/types/violation"
 
-// Mon & Wed at 1am PST = 9am UTC
+// Mon & Thurs at 1am PST = 9am UTC
 function getLastRefreshTime(): Date | null {
   const now = new Date()
-  const refreshDays = [1, 3] // Monday=1, Wednesday=3
+  const refreshDays = [1, 4] // Monday=1, Thursday=3
   for (let daysBack = 0; daysBack <= 14; daysBack++) {
     const candidate = new Date(now)
     candidate.setUTCDate(candidate.getUTCDate() - daysBack)
@@ -176,7 +176,7 @@ export function ViolationsDashboard() {
           </div>
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>Runs Mon &amp; Wed at 1am PST</span>
+            <span>Runs Mon &amp; Thurs at 1am PST</span>
           </div>
         </div>
       </div>
