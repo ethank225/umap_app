@@ -20,7 +20,7 @@ import type { Violation } from "@/types/violation"
 // Mon & Thurs at 1am PST = 9am UTC
 function getLastRefreshTime(): Date | null {
   const now = new Date()
-  const refreshDays = [1, 4] // Monday=1, Thursday=3
+  const refreshDays = [1, 2, 3, 4, 5] // Mon–Fri
   for (let daysBack = 0; daysBack <= 14; daysBack++) {
     const candidate = new Date(now)
     candidate.setUTCDate(candidate.getUTCDate() - daysBack)
@@ -176,7 +176,7 @@ export function ViolationsDashboard() {
           </div>
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <Clock className="h-3 w-3" />
-            <span>Runs Mon &amp; Thurs at 1am PST</span>
+            <span>Runs Every Weekday @ 1am PST</span>
           </div>
         </div>
       </div>

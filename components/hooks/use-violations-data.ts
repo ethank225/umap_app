@@ -12,7 +12,7 @@ interface UseViolationsReturn {
 // Mon & Thurs at 1am PST = 9am UTC
 function getMostRecentRefreshTime(): Date | null {
   const now = new Date()
-  const refreshDays = [1, 4] // Monday=1, Thursday=4
+  const refreshDays = [1, 2, 3, 4, 5] // Mon–Fri
   for (let daysBack = 0; daysBack <= 14; daysBack++) {
     const candidate = new Date(now)
     candidate.setUTCDate(candidate.getUTCDate() - daysBack)
