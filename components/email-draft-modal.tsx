@@ -32,11 +32,8 @@ interface ExpandedScreenshot {
   dataUrl: string
 }
 
-async function fetchScreenshot(token: string): Promise<string | null> {
+async function fetchScreenshot(screenshotUrl: string): Promise<string | null> {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const screenshotUrl = `${supabaseUrl}/storage/v1/object/public/images/screenshots/${token}.png`
-
     const response = await fetch(screenshotUrl)
     if (!response.ok) return null
 
@@ -47,7 +44,7 @@ async function fetchScreenshot(token: string): Promise<string | null> {
       reader.readAsDataURL(blob)
     })
   } catch (error) {
-    console.error(`Error fetching screenshot for token ${token}:`, error)
+    console.error(`Error fetching screenshot from ${screenshotUrl}:`, error)
     return null
   }
 }
@@ -116,9 +113,9 @@ export function EmailDraftModal({ open, onOpenChange, violations }: EmailDraftMo
     setLoadingScreenshots(true)
     const loadScreenshots = async () => {
       const screenshotPromises = violations
-        .filter((v) => v.immersive_product_page_token)
+        .filter((v) => v.screenshot_url)
         .map(async (v) => {
-          const dataUrl = await fetchScreenshot(v.immersive_product_page_token!)
+          const dataUrl = await fetchScreenshot(v.screenshot_url!)
           return dataUrl ? { token: v.immersive_product_page_token!, dataUrl } : null
         })
 

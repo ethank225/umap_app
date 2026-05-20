@@ -15,4 +15,5 @@ export interface Violation {
   gender: string
   violation: boolean
   confidence_score: number
+  screenshot_url: string | null
 }
